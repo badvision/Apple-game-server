@@ -308,3 +308,126 @@ src/main/java/ags/
 ```
 
 This design enables reliable, high-speed transfer of games and programs to Apple II computers while maintaining compatibility across the entire Apple II family and various serial interface options.
+
+## 8. Critical Timing Considerations
+
+### The Serial Buffer Problem
+
+The Apple II computers have **no serial buffer** or extremely limited buffering capacity in their serial hardware implementations. This fundamental constraint requires the host application to implement sophisticated timing controls to prevent data loss during high-speed transfers.
+
+### Key Timing Scenarios
+
+#### 1. **Character-Level Timing** (`GenericHost.java:256-268`)
+
+When sending data without echo checking, the host calculates precise timing based on both transmission speed and Apple processing time:
+
+```java
+// Calculate time for character transmission vs Apple processing
+long waitTime = DataUtil.nanosPerCharAtSpeed(currentBaud);
+long cycleTime = DataUtil.cyclesToNanos(4000);  // Apple CPU cycles per character
+waitTime = Math.max(waitTime, cycleTime) * 2;
+```
+
+The host waits for the **slower** of:
+- Serial transmission time at current baud rate
+- Apple CPU processing time (4000 cycles per character)
+
+An additional safety factor of 2× is applied, plus line-end delays of 1000 cycles per character.
+
+#### 2. **Compressed Data Transfer Timing** (`TransferHost.java:275-310`)
+
+The most critical timing occurs during compressed data transfer, where the host must pause between data blocks based on the Apple-side decompression workload:
+
+**XOR/Data Store Commands:**
+- Wait time: `40 nanoseconds` - Brief pause for mode switching commands
+
+**Uncompressed Data Blocks:**
+- Wait time: `73 - NANOS_PER_CHAR` - Account for 73 CPU cycles per character processing
+
+**Compressed Repetition Blocks:**
+- Wait time: `cyclesToNanos(reps * 101) + NANOS_PER_CHAR` - 101 cycles per repetition plus transmission time
+
+**XOR Mode Skipped Zeros:**
+- Wait time: `cyclesToNanos(50)` - 50 cycles to increment memory pointers
+
+#### 3. **Baud Rate Adaptive Timing** (`GenericHost.java:343-360`)
+
+Different timing strategies based on connection speed:
+
+**writeSlowly()** - Used for slower, more reliable transmission:
+```java
+int waitTime = Math.min(20, Math.max(100, (10000 / currentBaud)));
+if (currentBaud == 300) {
+    waitTime = 75;  // Special case for very slow connections
+}
+```
+
+**writeQuickly()** - Used for command sequences:
+```java
+int waitTime = Math.min(5, Math.max(100, (115200 / currentBaud) * 10));
+```
+
+#### 4. **Hardware Flow Control Integration** (`GenericHost.java:668-678`)
+
+When hardware flow control is enabled, the host waits for Clear-To-Send (CTS) signal:
+```java
+while (!port.getCTS() && timeout > 0) {
+    DataUtil.wait(10);
+    timeout -= 10;
+}
+```
+
+This prevents buffer overruns by waiting for the Apple to signal readiness.
+
+### Assembly-Side Considerations
+
+The Apple-side assembly code uses tight polling loops with no buffering:
+
+**Super Serial Card** (`ssc_routines.a:17-24`):
+```assembly
+readByteInline:
+    LDA #$08
+.readLoop
+    BIT ACIA_Status      ; Poll status register
+    BEQ .readLoop        ; Wait until data ready
+    LDA ACIA_Data        ; Read immediately
+```
+
+**Data Reception Loop** (`sos_main.a:90-104`):
+```assembly
+receiveBlock:
+    +readByteInline      ; Immediate read required
+    STA targetAddress    ; Store immediately  
+    EOR checksum         ; Update checksum
+    INC targetAddress    ; Increment pointer
+    DEC dataRemaining    ; Continue loop
+```
+
+### Critical Points Where Timing Matters
+
+1. **Mode Switching Commands** - When switching between XOR and store modes, the Apple needs time to reconfigure its processing logic.
+
+2. **Compressed Data Processing** - The Apple must decompress data in real-time, requiring calculated delays based on complexity.
+
+3. **Memory Operations** - Direct memory writes and pointer arithmetic consume CPU cycles that must be accounted for.
+
+4. **Status Polling** - The Apple continuously polls serial status registers with no interrupt buffering.
+
+### Error Recovery and Timing
+
+When timing failures occur, the system employs several recovery strategies:
+
+- **Checksum Mismatches** trigger retry with smaller chunk sizes
+- **tryToFixDriver()** sends burst of `@` commands to resynchronize
+- **Adaptive chunking** reduces data block sizes when errors occur
+- **Hardware flow control** provides hardware-level pacing
+
+### Implications for Reliability
+
+These timing constraints mean that:
+- **All data transmission must be paced** according to Apple processing capability
+- **No assumptions can be made** about buffering or background processing
+- **Error recovery is essential** due to the tight timing requirements
+- **Different Apple models** may have different timing characteristics requiring adaptive algorithms
+
+This careful timing orchestration is what enables reliable high-speed (115200 baud) communication with computers designed in the late 1970s that lack modern serial buffering capabilities.
