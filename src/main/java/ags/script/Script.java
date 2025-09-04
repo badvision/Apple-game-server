@@ -78,7 +78,14 @@ public class Script {
                 in = null;
             }
         } else {
+            // Try multiple class loaders to find the resource
             in = ClassLoader.getSystemResourceAsStream(scriptPath);
+            if (in == null) {
+                in = Thread.currentThread().getContextClassLoader().getResourceAsStream(scriptPath);
+            }
+            if (in == null) {
+                in = Script.class.getClassLoader().getResourceAsStream(scriptPath);
+            }
         }
         // If we don't have input, then stop right now!
         if (in == null) throw new InitalizationException("Specified script not found: "+scriptPath);

@@ -5,10 +5,6 @@
 
 package ags.game;
 
-import ags.controller.Launcher;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,19 +36,7 @@ public class GameUtil {
 
     public static List<Game> readGames() {
         try {
-            InputStream input;
-            File f = new File(Launcher.getDataFolder(), GAMES_DATA_FILE);
-            if (!f.exists()) {
-                input = Thread.currentThread().getContextClassLoader().getResourceAsStream(GAMES_DATA_FILE);
-            } else {
-                try {
-                    input = new FileInputStream(f);
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(GameUtil.class.getName()).log(Level.SEVERE, null, ex);
-                    return null;
-                }
-
-            }
+            InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("data/" + GAMES_DATA_FILE);
             if (input == null) return null;
             javax.xml.bind.JAXBContext jaxbCtx = javax.xml.bind.JAXBContext.newInstance(Games.class);
             Games out = (Games) jaxbCtx.createUnmarshaller().unmarshal(input);

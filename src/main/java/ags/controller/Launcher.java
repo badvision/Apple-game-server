@@ -39,17 +39,6 @@ import javax.swing.JTextArea;
  */
 public class Launcher implements Runnable {
 
-    public static File getDataFolder() {
-        File f = new File(DATA_DIR);
-        if (f.exists() && f.isDirectory()) return f;
-        f = new File(new File("."), DATA_DIR);
-        if (f.exists() && f.isDirectory()) return f;
-        f = new File(new File(".."), DATA_DIR);
-        if (f.exists() && f.isDirectory()) return f;
-        f = new File(System.getProperty("user.dir"), DATA_DIR);
-        if (f.exists() && f.isDirectory()) return f;
-        return null;
-    }
 
     static private class OutputStreamImpl extends OutputStream {
         private PrintStream out;
@@ -103,20 +92,6 @@ public class Launcher implements Runnable {
     public static String PORT = "1977";
     @Configurable(category = CATEGORY.COM, isRequired = false)
     public static boolean DEBUG_BOOTSTRAP = false;
-    @Configurable(category = CATEGORY.RUNTIME, isRequired = false)
-    @FileType("jar")
-    public static String RXTX_JAR_PATH = "lib/RXTXcomm.jar";
-    @Configurable(category = CATEGORY.RUNTIME, isRequired = true)
-    public static String RXTX_LIB_PATH = "rxtxSerial";
-    @Configurable(category = CATEGORY.RUNTIME, isRequired = true)
-    @FileType("jar")
-    public static String COMM_JAR_PATH = "lib/comm.jar";
-    @Configurable(category = CATEGORY.RUNTIME, isRequired = true)
-    @FileType("jar")
-    public static String JAXB_API_JAR_PATH = "lib/jaxb-api.jar";
-    @Configurable(category = CATEGORY.RUNTIME, isRequired = true)
-    @FileType(".")
-    public static String DATA_DIR = "lib/data";
     @Configurable(category = CATEGORY.ADVANCED, isRequired = false)
     public static DISPLAY_TYPES DISPLAY_TYPE = DISPLAY_TYPES.Hires_Buffered;
     static Thread activeThread = null;
@@ -161,22 +136,6 @@ public class Launcher implements Runnable {
         }
         TERMINATE_PROGRAM = false;
         activeThread = new Thread(new Launcher());
-        // Configure classpath to include jar and game resources
-        try {
-            List<URL> classpath = new ArrayList<URL>();
-            classpath.add(getDataFolder().getCanonicalFile().toURI().toURL());
-            classpath.add((new File(RXTX_JAR_PATH)).getCanonicalFile().toURI().toURL());
-            classpath.add((new File(COMM_JAR_PATH)).getCanonicalFile().toURI().toURL());
-            if (JAXB_API_JAR_PATH != null && !"".equals(JAXB_API_JAR_PATH)) {
-                classpath.add((new File(JAXB_API_JAR_PATH)).getCanonicalFile().toURI().toURL());
-            }
-            URL[] urls = classpath.toArray(new URL[0]);
-            activeThread.setContextClassLoader(new URLClassLoader(urls, Launcher.class.getClassLoader()));
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex);
-        }
         activeThread.setPriority(Thread.NORM_PRIORITY + 2);
         activeThread.start();
         Main.instance.startStopButton.setEnabled(true);
@@ -188,7 +147,6 @@ public class Launcher implements Runnable {
 //    @Override
     public void run() {
         try {
-            loadCommLibrary();
             validateRequirements();
             initPort();
             bootstrap();
@@ -218,53 +176,6 @@ public class Launcher implements Runnable {
         JOptionPane.showMessageDialog(null, "An error has occurred: \n" + showMessage, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void loadCommLibrary() throws RuntimeException {
-        // Load RXTX native library
-        try {
-            // Hopefully the user put RXTX in the right place
-            System.loadLibrary(RXTX_LIB_PATH);
-        } catch (UnsatisfiedLinkError ex) {
-            // If the user didn't, then first verify the lib exists and loads
-            try {
-                System.load(RXTX_LIB_PATH);
-                // Now figure out the directory the lib is sitting in
-                File f = new File(RXTX_LIB_PATH);
-                String lib = "";
-                try {
-                    lib = f.getParentFile().getCanonicalPath();
-                } catch (IOException ex1) {
-                    Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex1);
-                }
-                // Now the really ugly part: Hacking the system library path using introspection
-                // This could break in a later release of Java.  If so, take this part out
-                // and put the library where it was supposed to be in the first place.  :-D
-                Field paths = ClassLoader.class.getDeclaredField("usr_paths");
-                // Oops was that a private member.  Not any more!
-                paths.setAccessible(true);
-                String[] pathList = (String[]) paths.get(null);
-                if (Arrays.binarySearch(pathList, lib) < 0) {
-                    // There is a useful copy method in Arrays, but only in JDK 1.6
-                    String[] newPathList = new String[pathList.length + 1];
-                    for (int i = 0; i < pathList.length; i++) {
-                        newPathList[i] = pathList[i];
-                    }
-                    newPathList[pathList.length] = lib;
-                    System.out.println("Adding lib path " + lib);
-                    paths.set(null, newPathList);
-                }
-            } catch (UnsatisfiedLinkError ex1) {
-                throw new RuntimeException("Could not find rxtxSerial library in the expected lib path " + System.getProperty("java.library.path"));
-            } catch (IllegalArgumentException ex1) {
-                Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (IllegalAccessException ex1) {
-                Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (NoSuchFieldException ex1) {
-                Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (SecurityException ex1) {
-                Logger.getLogger(Launcher.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        }
-    }
 
     private void validateRequirements() throws RuntimeException {
         games = GameUtil.readGames();
