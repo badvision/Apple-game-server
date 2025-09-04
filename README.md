@@ -102,6 +102,9 @@ The project includes 6502 assembly code that is automatically compiled during th
 - **macOS**: Native executable or JAR (ARM64 and Intel)
 - **Linux**: Native executable or JAR (ARM64 and x86_64)
 
+### Communication Protocol
+For detailed technical documentation of the communication protocol, binary transfer mechanisms, and system architecture, see [DESIGN.md](DESIGN.md).
+
 ## Development
 
 ### Project Structure
