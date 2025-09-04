@@ -1,0 +1,140 @@
+; SLOT should already be inialized!
+PR0             = $FE93
+IN0             = $FE89
+RESET_VECTOR	= $03F2
+BELL            = $FF3A
+dataRemaining	= $08
+checksum        = $eb
+safety          = $ed
+targetAddress	= storeData+1	;Self modifying code alert!
+;------------------------------------------------
+!macro		sendByte byte {
+                    ldx #byte
+                    jsr sendByte
+			}
+!macro		sendByteMem byte {
+                    ldx byte
+                    jsr sendByte
+			}
+!macro		readByte {
+                    jsr readByte
+			}
+
+;------------------------------------------------
+                    SEI             ; re-enable interrupts
+                    +initSerialCard
+
+;--- send "hi" to the host to let it know we're alive
+ack
+                    +sendByte 'h'
+                    +sendByte 'i'
+                    jmp loaderLoop
+;------------------------------------------------
+setTargetAddress
+                    +readByte
+                    STA targetAddress
+                    +readByte
+                    STA targetAddress+1
+                    STA safety          ; This value really shouldn't be zero (in theory)
+                                        ; safety > 0 === safety is off and E will work
+                    jmp loaderLoop
+;-----------
+setLength
+                    +readByte
+                    STA dataRemaining
+                    +readByte
+                    STA dataRemaining+1
+                    bne loaderLoop          ;Always branch
+;-----------
+sendChecksum
+                    +sendByteMem checksum
+                    bne loaderLoop          ;Always branch
+;-----------
+sendError
+                    JSR BELL		; Beep!
+;                   jmp loaderLoop          ; the loader loop is next anyway
+;-----------
+;Main loader loop -- keeps going until it is told to execute (E)
+;or until it encounters an invalid command.  Can also be told to exit
+;with 'A' 00 00 'E' which will effectively issue a JMP $0000 command
+;this was moved to the middle of the whole program so relative branches keep working.
+;-----------
+loaderLoop
+                    +readByte
+                    SEC
+                    SBC #'@'
+                    BEQ ack             	;@
+                    TAY
+                    DEY
+                    BEQ setTargetAddress	;A
+                    DEY
+                    BEQ setLength   		;B
+                    DEY
+                    BEQ receiveBlock        ;C
+                    DEY
+                    BEQ sendChecksum        ;D
+                    DEY
+                    BEQ executeProgram      ;E
+                    DEY
+                    BEQ executeSubroutine	;F
+                    LDA #$00
+                    STA safety		; Engage safety to block "E" from executing anything
+                    DEY
+                    BEQ getKeypress         ;G
+                    BNE extra               ;H, etc
+;-----------
+receiveBlock
+                    LDY #$00
+                    STY safety		; Engage safety to block "E" from executing anything
+                    STY checksum
+.finishBlock
+                    +readByteInline
+storeData           STA targetAddress   ; This line is modified by the next INC instructions
+                    EOR checksum
+                    STA checksum
+                    ;--- finish loop...
+                    INC targetAddress
+                    BNE .decrementCounter
+                    INC targetAddress+1
+.decrementCounter
+                    DEC dataRemaining ; Note: hi-byte of dataremaining is set +1 to start
+                    BNE .finishBlock
+                    DEC dataRemaining+1
+                    BNE .finishBlock
+                    BEQ loaderLoop     ; Always branches
+;-----------
+executeProgram
+                    LDA safety		; If we got here without setting the address first,
+                    BEQ sendError	; then it must surely be in error!
+                    JSR IN0         ; Before executing a game, reset the firmware I/O
+                    JSR PR0
+                    +resetSerialCard
+                    CLI             ; re-enable interrupts
+doExecute
+                    JMP (targetAddress)
+executeSubroutine
+                    LDA safety		; If we got here without setting the address first,
+                    BEQ sendError   ; then it must surely be in error!
+                    JSR doExecute
+                    JMP ack
+;-----------
+getKeypress
+;                   LDY #$00       ; Y is already zero from the main loop
+key1                DEY
+                    BEQ endKeypress
+
+                    LDX $C000
+                    BPL key1
+                    STX $C010
+endKeypress         JSR sendByte
+                    BNE loaderLoop  ;Always branches
+extra
+                    jsr BELL
+                    jmp loaderLoop
+;------------------------------------------------
+sendByte		;Sends byte to SSC
+                    +sendByteInline
+                    RTS
+readByte
+                    +readByteInline
+                    RTS

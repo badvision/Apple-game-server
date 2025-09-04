@@ -1,0 +1,5 @@
+; This is a wrapper for running SOS at $801 with no relocation
+!source "routines.a"
+*=$800
+!byte $01              ; Junk byte...
+!source "sos/sos_main.a"

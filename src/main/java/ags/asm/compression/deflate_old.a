@@ -1,0 +1,85 @@
+* = $6000
+
+            ; Packbits-based decompression
+            ; Only uses two-byte patterns
+            ; Warning: Shameless usage of self-modifying code ahead
+PAGE1       = $2000
+PAGE2       = $4000
+
+            lda #<PAGE2
+            sta read+1
+            lda #>PAGE2
+            sta read+2
+;            lda #<PAGE1
+            jsr read
+            sta store+1
+            sta store2+1
+;            lda #>PAGE1
+            jsr read
+            sta store+2
+            sta store2+2
+main
+            jsr read
+            bne .1
+            rts             ; Encountered 0 -- no more data
+.1          bpl copy
+            ; Copy 2-byte pattern N+2 times
+            and #$7f
+            tay
+            iny
+            iny         ; $80 means 2 instances of the same pattern, etc
+            jsr read
+            sta PAT1+1
+            beq possibleSkip
+            jsr read
+            sta PAT2+1
+.2
+PAT1        lda #$00
+            jsr store
+PAT2        lda #$00
+            jsr store
+            dey
+            bne .2
+            beq main
+possibleSkip
+            jsr read
+            sta PAT2+1
+            bne .2
+skipPattern
+            tya
+            asl
+            bcc noOverflow  ; Handle cases where carry set afer ASL
+            inc store+2
+            inc store2+2
+noOverflow
+            clc
+            adc store+1
+            sta store+1
+            sta store2+1
+            lda #$00
+            adc store+2
+            sta store+2
+            sta store2+2
+            jmp main
+copy        ; Copy N bytes directly as-is
+            tay
+copy1       jsr read
+            jsr store
+            dey
+            bne copy1
+            beq main
+read        ldx $1000
+            inc read+1
+            bne .3
+            inc read+2
+.3
+            txa             ; Need to set Z and N flags!
+            rts
+store       eor $1000
+store2      sta $1000
+            inc store+1
+            inc store2+1
+            bne .4
+            inc store+2
+            inc store2+2
+.4          rts

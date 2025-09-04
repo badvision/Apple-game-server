@@ -1,0 +1,3 @@
+* = $BD00   ; Load below BEFF
+!source "sos/sos_extra.a"
+!source "compression/deflate_main.a"

@@ -1,0 +1,84 @@
+;Firmware routines specific to the Zialog SCC serial port (slot) used in the //gs
+;Requires SLOT is defined before including!
+
+!if     SLOT = 1 {
+SCC_Data    = $c03B
+SCC_Reg     = $c039
+} else {
+SCC_Data    = $c03A
+SCC_Reg     = $c038
+}
+
+!as	; switch to short accumulator
+!rs	; switch to short index registers
+
+!macro		sendByteInline {
+                    LDA #$04
+.sendloop
+                    BIT SCC_Reg
+                    BEQ .sendloop
+                    STX SCC_Data
+}
+
+!macro		readByteInline {
+                    ;Poll for next byte
+                    LDA #$01
+.readLoop
+                    BIT SCC_Reg
+                    BEQ .readLoop
+                    LDA SCC_Data
+;Another way of reading the SCC, but is it better?
+;                    LDA #$08
+;                    STA SCC_Reg
+;                    LDA SCC_Reg
+}
+
+; If only we could use this... too lengthy!
+!macro      setRegister reg, value {
+                    LDA #reg
+                    STA SCC_Reg
+                    !if value = 0 {
+                        STZ SCC_Reg
+                    } else {
+                        LDA #value
+                        STA SCC_Reg
+                    }
+}
+
+;Used whenever we're wanting to use the serial SLOT
+!macro      initSerialCard {
+                    ;Enable emulation mode (redundant?)
+                    ;sec
+                    ;xce
+                    ; Synchronize with SCC
+                    lda SCC_Reg
+                    ; Offsetting by 1 to leverage Z flag
+                    ldy #(.enddata - .data + 1)
+.initloop
+                    ; Offsetting by 1 (again) to leverage Z flag
+                    lda .data - 1,y
+                    sta SCC_Reg
+                    dey
+                    bne .initloop
+                    beq .enddata
+.data
+                    ;Select RTxC pin as clock source
+                    !if SLOT=1 {
+                        !byte %10000000, 11
+                    } else {
+                        !byte %00000000, 11
+                    }
+                    ;Disable baud rate generator
+                    !byte %10100000, 14
+                    ;x32 clock, 8-bit sync, 1 stop bit, no parity
+                    !byte %10000100, 4
+                    ; polling mode: WR9, bit 3 and WR1 bit 7 must be 0 to disable interrupts
+                    ; WR9 value taken from Apple //gs tech note #18
+                    !byte %00000010, 9
+                    !byte %00000000, 1
+.enddata
+}
+
+;Used whenever we're done with the serial port
+!macro      resetSerialCard {
+}

@@ -1,0 +1,98 @@
+BELL            = $FF3A
+            ; Packbits-based decompression
+            ; Only uses two-byte patterns
+            ; Warning: Shameless usage of self-modifying code ahead
+            dey
+            beq decompress
+            dey
+            beq softswitch
+; We don't know what command the user wants, so beep and exit
+            JSR BELL
+            RTS
+softswitch
+            jsr readByte
+            tax
+            lda $c000,x
+            rts
+;-------------------- Decompress packbits data
+decompress
+; Pull destination address from first two bytes
+            jsr readByte
+            sta store+1
+            sta store2+1
+            jsr readByte
+            sta store+2
+            sta store2+2
+main
+            jsr readByte
+            bne keepGoing
+            rts             ; Encountered 0 -- no more data
+keepGoing   bpl copy
+            ; Copy 2-byte pattern N+2 times
+            and #$7f
+            tay
+            iny
+            iny         ; $80 means 2 instances of the same pattern, etc
+            jsr readByte
+            sta PAT1+1
+XOR_FAST    beq possibleSkip ;Skip over areas with zero's -- should only happen when in XOR mode!
+;           lda #$15         ;Self-modifying code changes it to this when in STORE-only mode
+            jsr readByte
+            sta PAT2+1
+storePattern
+PAT1        lda #$00
+            jsr store
+PAT2        lda #$00
+            jsr store
+            dey
+            bne storePattern
+            beq main
+possibleSkip
+            jsr readByte
+            sta PAT2+1
+            bne storePattern
+skipPattern
+            tya
+            asl
+            bcc noOverflow  ; Handle cases where carry set afer ASL
+            inc store+2
+            inc store2+2
+noOverflow
+            clc
+            adc store+1
+            sta store+1
+            sta store2+1
+            lda #$00
+            adc store+2
+            sta store+2
+            sta store2+2
+            jmp main
+copy        ; Copy N bytes directly as-is
+            tay
+            sec
+            sbc #$7D            ; If value <= 7D, carry will be cleared
+            bcc copy1
+            lsr                 ; if value was 7e, A will be 1 -- if 7f, A will be 2
+            ror                 ; Shift 3 places over (so 1 -> 40, 2 -> 80)
+            ror
+            adc #$0D            ; Add D (carry should have been cleared by now)
+            sta store           ; Update opcode at "store" routine (7E -> 4D = EOR, 7F -> 8D = STA)
+                                ; Short out the XOR logic that skips over areas of zeros if need be...
+            eor #$BD            ; 4D -> F0, 8D -> 30
+            bmi hackjob
+            lda #$A9            ; LDA IMM (bypasses b  ranch logic altogether)
+hackjob     sta XOR_FAST
+            jmp main            ; No convenient way to do this with relative branching (V flag, maybe?)
+copy1       jsr readByte
+            jsr store
+            dey
+            bne copy1
+            beq main
+store       eor $1000
+store2      sta $1000
+            inc store+1
+            inc store2+1
+            bne exit
+            inc store+2
+            inc store2+2
+exit        rts

@@ -1,0 +1,31 @@
+; Extension stub for SOS -- this registers a custom command handler to be called by SOS
+; This stub should be included at the start
+; When the handler is called, Y will represent the command being processed.
+; sendByte and readByte will be remapped to the SOS read/write routines
+
+            REG_OFFSET = 21         ; Distance between doExecute and extra in SOS
+            SOS_START = $BF00       ; Assumes SOS_HIMEM
+            STACK = $100
+; First thing to do is register our handler by looking at our caller's address
+            TSX
+            INX
+            LDA STACK,X
+            CLC
+            ADC #REG_OFFSET
+            TAX
+            LDA #<handler
+            STA SOS_START,X
+            LDA #>handler
+            INX
+            STA SOS_START,X
+; Now build pointers to the send/receive routines
+            TXA
+            CLC
+            ADC #4
+            STA sendByte+1
+            ADC #11
+            STA readByte+1
+            RTS
+sendByte    JMP $BF00
+readByte    JMP $BF00
+handler

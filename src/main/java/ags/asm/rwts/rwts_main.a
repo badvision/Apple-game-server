@@ -1,0 +1,89 @@
+;dataRemaining=$08           ; TODO: Find two safe consecutive ZP regs to use
+
+F1                  STY readData+1
+F2                  STA readData+2
+dr1                 STX dataRemaining
+                    LDA #$01
+dr2                 STA dataRemaining+1
+                    sei                     ; Disable interrupts
+;-----------
+sendBlock
+readData            LDX $0000         ; This line is modified by the next INC instructions
+;F17                jsr sendByte
+                    +sendByteInline
+F3                  INC readData+1
+                    BNE dr3
+F4                  INC readData+2
+dr3                 DEC dataRemaining ; Note: hi-byte of dataremaining is set +1 to start
+                    BNE sendBlock
+dr4                 DEC dataRemaining+1
+                    BNE sendBlock
+                    beq loaderLoop     ; Always branches
+;---------------------------------
+RWTS_EXIT           +rwtsExit
+;-----------
+dataRemaining       !byte 0, 0         ; Need to relocate all refs
+;-----------
+;Main loader loop -- keeps going until it is told to end (E)
+;-----------
+loaderLoop
+F5                  JSR readByte
+                    BEQ setTargetAddress	;0
+                    TAY
+                    DEY
+                    BEQ setLength   		;1
+                    DEY
+                    BEQ receiveBlock        ;2
+                    DEY
+                    BEQ sendBlock           ;3
+                    BNE RWTS_EXIT           ;Done
+;------------------------------------------------
+setTargetAddress
+F6                  JSR readByte
+F7                  STA storeData+1
+F8                  STA readData+1
+F9                  JSR readByte
+F10                 STA storeData+2
+F11                 STA readData+2
+                    clc
+                    bcc loaderLoop          ;Always branch
+;-----------
+setLength
+F12                 JSR readByte
+dr5                 STA dataRemaining
+F13                 JSR readByte
+dr6                 STA dataRemaining+1
+                    clc
+                    bcc loaderLoop          ;Always branch
+;-----------
+receiveBlock
+;F17                 JSR readByte
+                    +readByteInline
+storeData           STA $0000               ; This line is modified by the next INC instructions
+F14                 INC storeData+1
+                    BNE dr7
+F15                 INC storeData+2
+dr7                 DEC dataRemaining ; Note: hi-byte of dataremaining is set +1 to start
+                    BNE receiveBlock
+dr8                 DEC dataRemaining+1
+                    BNE receiveBlock
+                    beq loaderLoop     ; Always branches
+;------------------------------------------------
+sendByte		;Sends byte to SSC
+                    +sendByteInline
+                    RTS
+readByte
+                    +readByteInline
+                    RTS
+;-----------------------------------------------
+;                 Relocation table
+;Indicates all non-relocatable statements
+;It is important these be adjusted depending
+;on where these routines are stored
+;Fortunately, the java program knows where
+;RWTS is being loaded every time.  Oh happy day!
+;------------------------------------------------
+relocation      !byte <F1+1, <F2+1, <F3+1, <F4+1, <F5+1, <F6+1, <F7+1, <F8+1
+                !byte <F9+1, <F10+1, <F11+1, <F12+1, <F13+1, <F14+1, <F15+1
+                !byte <dr1+1, <dr2+1, <dr3+1, <dr4+1, <dr5+1, <dr6+1, <dr7+1, <dr8+1
+                !byte 23
