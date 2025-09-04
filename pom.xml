@@ -36,9 +36,9 @@
     </scm>
     
     <properties>
-        <maven.compiler.source>23</maven.compiler.source>
-        <maven.compiler.target>23</maven.compiler.target>
-        <maven.compiler.release>23</maven.compiler.release>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         
@@ -91,10 +91,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.12.1</version>
                 <configuration>
-                    <release>23</release>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+                    <release>17</release>
                 </configuration>
             </plugin>
             
@@ -104,7 +101,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <argLine>--enable-preview</argLine>
                 </configuration>
             </plugin>
             
@@ -150,7 +146,6 @@
                     <mainClass>${mainClass}</mainClass>
                     <buildArgs>
                         <buildArg>--no-fallback</buildArg>
-                        <buildArg>--enable-preview</buildArg>
                         <buildArg>--allow-incomplete-classpath</buildArg>
                         <!-- Serial port access requires reflection -->
                         <buildArg>--initialize-at-run-time=com.fazecast.jSerialComm</buildArg>
@@ -168,7 +163,6 @@
                     <mainClass>${mainClass}</mainClass>
                     <classpathScope>compile</classpathScope>
                     <options>
-                        <option>--enable-preview</option>
                     </options>
                 </configuration>
                 <executions>
@@ -182,7 +176,6 @@
                             <mainClass>ags.assembly.AssemblyCompiler</mainClass>
                             <classpathScope>compile</classpathScope>
                             <options>
-                                <option>--enable-preview</option>
                             </options>
                         </configuration>
                     </execution>

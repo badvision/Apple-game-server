@@ -12,7 +12,7 @@ A modernized Java application that serves a menu of Apple // games over serial c
 
 ## Requirements
 
-- **Java 23+** with preview features enabled
+- **Java 17+**
 - **Maven 3.6+** for building
 - Serial connection to Apple // computer (physical serial port, USB-to-serial adapter, or TCP connection for emulators)
 
@@ -33,7 +33,7 @@ mvn clean package -Pnative
 
 ### From JAR
 ```bash
-java --enable-preview -jar target/apple-game-server.jar
+java -jar target/apple-game-server.jar
 ```
 
 ### From Maven
@@ -47,7 +47,7 @@ mvn exec:java
 The application includes basic HiDPI scaling support for modern displays. The UI scale is set to 2.0x by default. To adjust for your display, you can modify the `sun.java2d.uiScale` property in the `Main.java` file or run with a custom scale:
 
 ```bash
-java -Dsun.java2d.uiScale=1.5 --enable-preview -jar target/apple-game-server.jar
+java -Dsun.java2d.uiScale=1.5 -jar target/apple-game-server.jar
 ```
 
 ## Setup
@@ -85,7 +85,7 @@ Once the games menu appears on your Apple //:
 ## Technical Details
 
 ### Modern Architecture
-- **Java 23** with preview features and modern APIs
+- **Java 17** with modern APIs
 - **Maven** build system with standardized project structure
 - **jSerialComm** library for reliable cross-platform serial communication
 - **Native ACME** cross-assembler integration for 6502 code compilation
@@ -121,7 +121,7 @@ target/classes/ags/asm/ # Compiled assembly objects
 - **JUnit 5**: Testing framework
 
 ### Build Process
-1. Compile Java sources (Java 23 with preview features)
+1. Compile Java sources (Java 17)
 2. Copy resources to target directory
 3. Compile 6502 assembly files using native ACME
 4. Generate assembly variants for all slot/card combinations
@@ -131,7 +131,7 @@ target/classes/ags/asm/ # Compiled assembly objects
 
 This is a modernized version of the original Apple Game Server. Key improvements:
 
-- ✅ **Modern Java 23** (was Java 1.5+)
+- ✅ **Modern Java 17** (was Java 1.5+)
 - ✅ **Maven build system** (was Apache ANT)
 - ✅ **jSerialComm library** (was RXTX)
 - ✅ **Native ACME integration** (was external dependency)
