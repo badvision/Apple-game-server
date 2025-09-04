@@ -134,7 +134,8 @@ This is a modernized version of the original Apple Game Server. Key improvements
 **Original Author**: brendan.robert (a) gmail.com
 
 **Community**: 
-- usenet: comp.sys.apple2, comp.emulators.apple2, comp.sys.apple2.programmer
+- Apple2Infinitum Slack: [https://prodos8.com/apple2infinitum/](https://prodos8.com/apple2infinitum/)
+- Facebook Apple II Enthusiasts: [https://www.facebook.com/groups/5251478676](https://www.facebook.com/groups/5251478676)
 - GitHub: [Apple Game Server](https://github.com/badvision/Apple-game-server)
 
 ## License
