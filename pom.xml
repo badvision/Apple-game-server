@@ -14,6 +14,27 @@
     <description>Upload games to Apple // computers via serial connection</description>
     <url>https://github.com/badvision/Apple-game-server</url>
     
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <name>Brendan Robert</name>
+            <email>brendan.robert@gmail.com</email>
+        </developer>
+    </developers>
+    
+    <scm>
+        <connection>scm:git:git://github.com/badvision/Apple-game-server.git</connection>
+        <developerConnection>scm:git:ssh://github.com:badvision/Apple-game-server.git</developerConnection>
+        <url>http://github.com/badvision/Apple-game-server/tree/main</url>
+    </scm>
+    
     <properties>
         <maven.compiler.source>23</maven.compiler.source>
         <maven.compiler.target>23</maven.compiler.target>
