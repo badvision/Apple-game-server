@@ -1,0 +1,1967 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : games.xml
+    Created on : May 17, 2006, 6:34 PM
+    Author     : brobert
+    Description:
+        Lists all games and other necessary information
+-->
+<games xmlns="http://badvision.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://badvision.org file://home/brobert/Documents/Personal/a2gameserver/src/resources/ags.xsd">
+    <game file="AGENT.USA#060801" name="Agent USA" start="0801" type="06">
+        <author>Tom Snyder / Scholastic</author>
+        <description>This is an educational game designed to teach US State Capitals. It is focused around a mutant television set, called the "Fuzzbomb" which infects United States cities.
+            Agent USA can defeat the Fuzzbomb by growing energy crystals, and travels the United States via train, encoutering "fuzzed cities" along the way.
+            Beware the mutant inhabitants, which take the Agent's crystals.</description>
+        <screenshot>agentusa1.png</screenshot>
+        <screenshot>agentusa2.png</screenshot>
+        <year>1984</year>
+    </game>
+
+    <game file="AIR.CARS#066000" name="Air Cars" start="6000" type="06">
+        <author/>
+        <description/>
+        <screenshot>aircars1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ALCAZAR#0607fd" name="Alcazar" start="07fd" type="06">
+        <author>Tom Loughry / Activision</author>
+        <description>In this adventure game you control an explorer who's on his way to fortress
+            Alcazar. To reach Alcazar you are travelling through a countryside of fortresses and you
+            need to collect several items that you can find along the way. Once you enter the
+            Alcazar fortress you have to search for the crown.</description>
+        <screenshot/>
+        <year>1985</year>
+    </game>
+
+    <game file="ALIEN.AMBUSH#064000" name="Alien Ambush" start="4000" supportsKeyboard="false" type="06">
+        <author>Micro D / DANA</author>
+        <description>A rather simple, yet original, vertical space shooter. You control a small
+            space fighter tasked with extermination of hordes of alien spaceships. At first,
+            different slow moving motherships attack you in four separate waves. When hit they
+            release two smaller but much faster moving shuttles. To progress to the next attack wave
+            the player must shoot down both the mothership and the two shuttles capsules while
+            evading getting hit by either.</description>
+        <screenshot/>
+        <year>1983</year>
+    </game>
+
+    <game file="ALIEN.GAME#0607fd" name="Alien Game" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>aliengame1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ALIEN.MUNCHIES#064790" name="Alien Munchies" start="4790" type="06">
+        <author/>
+        <description/>
+        <screenshot>alienmunchies1.png</screenshot>
+        <screenshot>alienmunchies2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ALIEN.TYPHOON#060fe0" name="Alien Typhoon" start="0fe0" type="06">
+        <author>Star Craft</author>
+        <description>Alien Typhoon is a clone of the arcade game Galaxian. It is a shoot-'em-up
+            where a formation of alien ships attack your lone starship at the bottom of the screen.
+            The aliens peel off from the formation and attack you in different patterns, depending
+            on the color of the ship. The two ships at the top are the motherships and they bring an
+            escort of two red aliens with them to guard them, but if you can shoot the escort and
+            then the mothership, you'll score lots of points.</description>
+        <screenshot>alientyphoon1.png</screenshot>
+        <screenshot>alientyphoon2.png</screenshot>
+        <year>1981</year>
+    </game>
+
+    <game file="ALIVADER#060200" name="Alivader" start="0200" type="06">
+        <author/>
+        <description/>
+        <screenshot>alivader.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ALL.STAR.BASEBA#fc0801" name="All Star Baseball" start="0801" type="fc">
+        <author/>
+        <description>Really slow applesoft-based baseball game</description>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="APE.ESCAPE#0607fd" name="Ape Escape" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>apeescape1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="APPLE.OIDS#061ffd" name="Apple Oids" start="1ffd" type="06">
+        <author/>
+        <description/>
+        <screenshot>appleoids1.png</screenshot>
+        <year/>
+    </game>
+
+    <game name="Apple Panic" supportsKeyboard="true" supportsJoystick="false" supportsMouse="false" type="06">
+        <author>Olaf Lubeck / Broderbund</author>
+        <description>You control a digger, armed with his shovel, and you must kill your opponents -
+            the evil legged apples. Your character can only walk left/right and climb up/down the
+            ladders - no jumping - and if the apples touch you, you'll lose. To kill an apple you
+            must dig a hole on the ground and wait for one of them to get stuck on it. Then you must
+            hit it with your shovel to make it fall.</description>
+        <part action="subroutine" file="APL.PANIC.TITLE#0626fd" name="Apple Panic Title" start="26fd" type="06"/>
+        <part action="run" file="APPLE.PANIC#064000" name="Apple Panic" start="4000" type="06"/>
+        <screenshot>applepanic2.png</screenshot>
+        <year>1981</year>
+    </game>
+
+    <game file="APPLE.PANIC.JOY#0607fd" name="Apple Panic Joystick" start="07fd" type="06">
+        <author>Olaf Lubeck / Broderbund</author>
+        <description>Joystick-only variant of Apple Panic</description>
+        <screenshot>applepanic2.png</screenshot>
+        <year>1981</year>
+    </game>
+
+    <game file="APPLE.ZAP#063ffd" name="Apple Zap" start="3ffd" type="06">
+        <author/>
+        <description/>
+        <screenshot>applezap1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="AQUATRON#060801" name="Aquatron" start="0801" type="06">
+        <author>Sierra On-Line</author>
+        <description>It's just you and your jet, which can also 'fly' underwater, against massive
+            spawning armadas of aliens. Scrolls at lightspeed and makes you sweat heavily. Cheats:
+            Level skip [Ctrl] + @, Restart [Ctrl] + C or R, Reselect controls: [Ctrl] + I, Turn
+            around instantly: [Ctrl] + T</description>
+        <screenshot>aquatron1.png</screenshot>
+        <screenshot>aquatron2.png</screenshot>
+        <year>1983</year>
+    </game>
+
+    <game file="ArcadeBootCamp.dsk" name="Arcade Boot Camp" supportsKeyboard="false" supportsJoystick="1" supportsMouse="0" type="disk">
+        <screenshot/>
+    </game>
+
+    <game file="ARENA.OF.OCTOS#fc0801" name="Arena of Octos" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ASTEROIDS#060800" name="Asteroids" start="0800" type="06">
+        <author>Atari</author>
+        <description>Asteroids is a conversion of the popular arcade game. You are the pilot of a
+            spaceship trapped in the asteroid belt, and you need to blast your way out! Each time
+            you shoot one of the asteroids, it will break up into smaller pieces. Eventually the
+            pieces will become small enough that they can be destroyed. When all asteroids have been
+            fully destroyed, you can move on to the next, more difficult round. Just in case the
+            numerous asteroids didn't cause you enough trouble, a pesky flying saucer will appear
+            from time to time and try to shoot your spaceship with torpedoes.</description>
+        <screenshot>asteroids1.png</screenshot>
+        <year>1981</year>
+    </game>
+
+    <game file="AUTOBAHN#060801" name="Autobahn" start="0801" supportsKeyboard="false" supportsJoystick="true" type="06">
+        <author>Nasir Gebelli / Sirius Software</author>
+        <description>A clone of the arcade game Monaco GP, Autobahn is a very simple and fast arcade
+            racer. As you blaze down the roadway you must avoid colliding with other cars and road
+            hazards. You have three speeds you can run your car at and the high score is determined
+            by the number of miles you've driven. Ctrl-P switches to Paddles.</description>
+        <screenshot>autobahn1.png</screenshot>
+        <screenshot>autobahn2.png</screenshot>
+        <year>1981</year>
+    </game>
+
+    <game file="B1.BOMBER#fc0801" name="B1 Bomber" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="BALLBLAZER#0607fd" name="BallBlazer" start="07fd" type="06">
+        <author>Lucasfilm Games / Epyx</author>
+        <description>Ballblazer is a one-on-one soccer match set in the future. You control a robot
+            and try to snare a floating ball called a Plasmorb, which could then be fired or carried
+            into the opponent's goal. You play on a simple 3d playfield which is split in half. You
+            can play against the computer or against another robot controlled by a human
+            player.</description>
+        <screenshot>ballblazer1.png</screenshot>
+        <screenshot>ballblazer2.png</screenshot>
+        <year>1985</year>
+    </game>
+
+    <game file="BATTLE.AT.SEA#fc0801" name="Battle At Sea" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="BATTLE.CRUISER#060803" name="!Battle Cruiser" start="0803" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="BCQUEST#0607fd" name="BC's Quest for Tires" start="07fd" type="06">
+        <author>Sydney Development Group / Sierra On-Line </author>
+        <description>Cute Chick is in trouble! She is being held captive by the dinosaur, and it is
+            up to Thor to ride his trusty wheel to the rescue. There are many obstacles in the way
+            which Thor will need to jump and duck, including rocks, trees, rivers, lava pits,
+            cliffs, and of course Fat Broad. When you duck, the character bounces up and down, so
+            don't duck too soon.</description>
+        <screenshot>bcquest1.png</screenshot>
+        <screenshot>bcquest2.png</screenshot>
+        <year>1983</year>
+    </game>
+
+    <game file="BEACH.HEAD#0607fd" name="Beach Head" start="07fd" type="06">
+        <author>Access Software</author>
+        <description>Your mission is to storm the island and recapture it. This takes place over the
+            course of 6 different sequences. The first sequence is Aerial Reconnissance where the
+            fleet must be moved directly past the enemy or into a hidden passage. Optional is this
+            Hidden Passage sequence, where the player will have to manuever around mines and
+            torpedos.</description>
+        <screenshot>beachhead1.png</screenshot>
+        <year>1985</year>
+    </game>
+
+    <game name="Bellhop" type="06">
+        <author/>
+        <part action="subroutine" file="BELLHOP.TITLE#063ffd" name="Bellhop title" start="3ffd" type="06"/>
+        <part action="run" file="BELLHOP#061700" name="Bellhop" start="1700" type="06"/>
+        <screenshot>bellhop1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BILESTOAD#060800" name="Bilestoad" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>bilestoad1.png</screenshot>
+        <screenshot>bilestoad2.png</screenshot>
+        <screenshot>bilestoad3.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BIRTH.OF.THE.PH#0607fd" name="Birth of the Phoenix" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>birthofthephoenix.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BLACK.FLAME.PIN#06177d" name="Black Flame Pinball" start="177d" type="06">
+        <author/>
+        <description/>
+        <screenshot>blackflame.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BLACKOUT#06177d" name="Blackout" start="177d" type="06">
+        <author/>
+        <description/>
+        <screenshot>blackout1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BLISTER.BALL#060200" name="Blister Ball" start="0200" type="06">
+        <author/>
+        <description/>
+        <screenshot>blisterball.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BLITZKRIEG#060801" name="Blitzkrieg" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>blitzkrieg.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BLOBS#fc0801" name="Blobs" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="BLOODSUCKERS#0603fd" name="Bloodsuckers" start="03fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>bloodsuckers1.png</screenshot>
+        <screenshot>bloodsuckers2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BOLO#061100" name="Bolo" start="1100" type="06">
+        <author/>
+        <description/>
+        <screenshot>bolo2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BRICK.OUT#fc0801" name="Brick Out" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="BUG.ATTACK#060801" name="Bug Attack" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>bugattack1.png</screenshot>
+        <screenshot>bugattack2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BUG.BATTLE#060800" name="Bug Battle" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>bugbattle.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BURGERTIME#060801" name="Burgertime" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>burgertime1.png</screenshot>
+        <screenshot>burgertime2.png</screenshot>
+        <screenshot>burgertime3.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BURNOUT#060900" name="Burnout" start="0900" type="06">
+        <author/>
+        <description/>
+        <screenshot>burnout.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="BUZZARD.BAIT#060801" name="Buzzard Bait" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>buzzardbait1.png</screenshot>
+        <screenshot>buzzardbait2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CANNON.BLITZ#0607fd" name="Cannon Blitz" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>cannonballblitz1.png</screenshot>
+        <screenshot>cannonballblitz2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CANYON.CLIMBER#063000" name="Canyon Climber" start="3000" type="06">
+        <author/>
+        <description/>
+        <screenshot>canyonclimber.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CC.RALLY#060800" name="CC Rally" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>ccrally.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CEILING.ZERO#061ec0" name="Ceiling Zero" start="1ec0" type="06">
+        <author/>
+        <description/>
+        <screenshot>ceilingzero1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CENTIPEDE#064000" name="!Centipede" start="4000" type="06">
+        <author/>
+        <description/>
+        <screenshot>centipede.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CHECKERS#fc0801" name="Checkers" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="Chipwits.dsk" name="Chipwits" supportsKeyboard="0" supportsJoystick="1" supportsMouse="1" type="disk">
+        <screenshot/>
+    </game>
+
+    <game file="CHOPLIFTER#060801" name="Choplifter" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>choplifter1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CITY.OF.SUMER#fc0801" name="City of Sumer" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="COLLECT#065ffd" name="Collect" start="5ffd" type="06">
+        <author/>
+        <description/>
+        <screenshot>collect1.png</screenshot>
+        <screenshot>collect2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CONNECT.4#fc0801" name="Connect-4" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="COSMIC.JUGGLER#0607fd" name="Cosmic Juggler" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>cosmicjuggler.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="COUNTY.CARNIVAL#060800" name="County Carnival" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>countycarnival1.png</screenshot>
+        <screenshot>countycarnival2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CRAZY.CLIMBER#0607fd" name="Crazy Climber" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>crazyclimber.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CRIMEWAVE#062000" name="Crimewave" start="2000" type="06">
+        <author/>
+        <description/>
+        <screenshot>crimewave.png</screenshot>
+        <year/>
+    </game>
+
+    <game name="Crossfire" type="06">
+        <author/>
+        <description/>
+        <part action="subroutine" file="CROSSFIRE.TITLE#0607fd" name="Crossfire title" start="07fd" type="06"/>
+        <part action="run" file="CROSSFIRE#060801" name="Crossfire" start="0801" type="06"/>
+        <screenshot>crossfire1.png</screenshot>
+        <screenshot>crossfile2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CRYSTAL.CASTLES#060801" name="Crystal Castles" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>crystalcastles1.png</screenshot>
+        <screenshot>crystalcastles2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CUBIT#060801" name="Cubit" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>cubit1.png</screenshot>
+        <screenshot>cubit2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CYCLOD#060900" name="Cyclod" start="0900" type="06">
+        <author/>
+        <description/>
+        <screenshot>cyclod1.png</screenshot>
+        <screenshot>cyclod2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="CYCLOTRON#0607fd" name="Cyclotron" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>cyclotron.png</screenshot>
+        <screenshot>cyclotron2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DAWN.TREADER#0607fd" name="!Dawn Treader" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>dawntreader.png</screenshot>
+        <screenshot>dawntreader2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DEATHMAZE.5000#060805" name="Deathmaze 5000" start="0805" type="06">
+        <author/>
+        <description/>
+        <screenshot>deathmaze.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DEEP.WATER.DANG#0607fd" name="Deep Water Danger" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>deepwater.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DEFENDER#060801" name="Defender" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>defender.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DIAMOND.MINE#0607fd" name="Diamond Mine" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>diamondmine1.png</screenshot>
+        <screenshot>diamondmine2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DIG.DUG#060801" name="Dig Dug" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>digdug1.png</screenshot>
+        <screenshot>digdug2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DIG.EM#060300" name="Dig 'em" start="0300" type="06">
+        <author/>
+        <description/>
+        <screenshot>digem1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DINO.EGGS#0607a5" name="Dino Eggs" start="07a5" type="06">
+        <author/>
+        <description/>
+        <screenshot>dinoeggs1.png</screenshot>
+        <screenshot>dinoeggs2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DOGFIGHT#060800" name="Dogfight" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>dogfight.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DRAWPOKER#061500" name="Draw Poker" start="1500" type="06">
+        <author/>
+        <description/>
+        <screenshot>drawpoker1.png</screenshot>
+        <screenshot>drawpoker2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DRELBS#060afd" name="!Drelbs" start="0afd" type="06">
+        <author/>
+        <description/>
+        <screenshot>drelbs2.png</screenshot>
+        <screenshot>drelbs3.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="DUNG.BEETLES#0603fd" name="Dung Beetles" start="03fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>dungbeetles1.png</screenshot>
+        <screenshot>dungbeetles2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="EAGLE.EGGS#060800" name="Eagle Eggs" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>eagleeggs.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ELIMINATOR#0607fd" name="Eliminator" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>eliminator1.png</screenshot>
+        <screenshot>eliminator2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ELIMINATOR.INST#fc0801" name="Eliminator instructions" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot>eliminator1.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ELIZA#fc0801" name="Eliza" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="EXTERMINATOR#064200" name="Exterminator" start="4200" type="06">
+        <author/>
+        <description/>
+        <screenshot>exterminator2.png</screenshot>
+        <screenshot>exterminator3.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="FALCONS#060801" name="Falcons" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>falcons1.png</screenshot>
+        <screenshot>falcons2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="FENDER.BENDER#0624b0" name="Fender Bender" start="24b0" type="06">
+        <author/>
+        <description/>
+        <screenshot>fenderbender1.png</screenshot>
+        <screenshot>fenderbender2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="FIRE.AND.ICE#0607fd" name="Fire and Ice" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>fireandice1.png</screenshot>
+        <screenshot>fireandice2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="FIREBIRD#060801" name="Firebird" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>firebird.png</screenshot>
+        <year/>
+    </game>
+    <game file="Fishies.dsk" name="Fishies" type="disk">
+       <author>Jersey Cow Software and Cognetics Corp.</author>
+       <description>A virtual fishtank.  Known keys that work are "F" and Space bar.</description>
+       <screenshot/>
+    </game>
+    <game file="FLAP.SMACK#0608fd" name="Flap Smack" start="08fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="flicker2#066000" name="Flicker Color Test" start="6000" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game name="Flicker image: Billie Piper" start="0300" type="06">
+        <author/>
+        <description/>
+        <part action="load" file="mask_131#062000" length="4000" name="auxImage" start="2000" type="06"/>
+        <part action="subroutine" file="dhgr#060300" name="dhgr_init" start="0300" type="06"/>
+        <part action="load" file="mask_131#062000" length="4000" name="mainImage" offset="4000" start="2000" type="06"/>
+        <part action="run" file="flicker_dhgr#066000" name="flicker" start="6000" type="06"/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="FLIGHT.SIMULATO#0607fa" name="Flight Simulator" start="07fa" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="FORMULA.1.RACER#060801" name="Formula 1 Racer" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="FRAZZLE#0607fd" name="Frazzle" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="FREE.FALL#0607a5" name="Free Fall" start="07a5" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="FRENZY#06190b" name="Frenzy" start="190b" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="FROGGER#060801" name="Frogger" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="FRONTLINE#062000" name="Frontline" start="2000" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GADGETZ#0607fd" name="Gadgetz" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GALACTIC.EMPIRE#fc0801" name="Galactic Empire" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GALAXIAN#060801" name="Galaxian" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GALAXIAN.KEY#061600" name="Galaxian key" start="1600" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GALAXY.WARS#0607fd" name="Galaxy Wars" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GCAT#fc0801" name="GCAT" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GENESIS#0608fd" name="Genesis" start="08fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game name="Gladiator" type="06">
+        <author/>
+
+
+        <description/>
+        <!--<part action="subroutine" file="GLADIATOR.TITLE#fc0801" name="Gladiator title" start="0801" type="fc"/>-->
+        <part action="run" file="GLADIATOR#064000" name="Gladiator" start="4000" type="06"/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GO#060800" name="GO" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GOLD.RUSH#0607fd" name="Gold Rush" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GRAPPLE#0607fd" name="Grapple" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="GUARDIAN#060801" name="Guardian" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HARD.HAT.MACK#060801" name="Hard Hat Mack" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HARDHAT#065000" name="Hardhat" start="5000" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HEAD.ON#060ff1" name="Head On" start="0ff1" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HELL.STORM#061200" name="Hell Storm" start="1200" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HERO#060801" name="Hero" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HIGHRISE#0607f2" name="Highrise" start="07f2" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HIVE.KEEPERS#0607fd" name="Hive Keepers" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HOE.HOPPER.PIN#06177d" name="Hoe Hopper Pin" start="177d" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HORIZON.V#060801" name="Horizon V" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HUNGRY.BOY#0615e6" name="Hungry Boy" start="15e6" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="HYPER.HEAD.ON#060800" name="Hyper Head On" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ImpossibleMission.dsk" name="Impossible Mission" supportsKeyboard="1" supportsJoystick="1" supportsMouse="0" type="disk">
+        <screenshot/>
+    </game>
+
+    <game name="Inferno" type="06">
+        <author/>
+
+
+        <description/>
+        <part action="load" file="INFERNO.SHAPES#066000" name="Inferno Shapes" start="6000" type="06"/>
+        <part action="run" file="INFERNO.OBJ#066290" name="Inferno obj" start="6290" type="06"/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="INTERLUDE#060800" name="Interlude" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="JAWBREAKER#063ff0" name="Jawbreaker" start="3ff0" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="JIGSAW#060800" name="Jigsaw" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="JOURNEY#fc0801" name="Journey" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="JUGGLER#fc0801" name="Juggler" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="JungleHunt.dsk" name="Jungle Hunt" supportsKeyboard="1" supportsJoystick="1" supportsMouse="0" type="disk">
+        <author>Atarisoft</author>
+        <description>Jungle Hunt offers four unique adventure experiences, which repeat with greater
+            difficulty once all four have been survived. If you don't survive these adventures, you
+            will not only lose your own life but that of the lovely Penelope, who has been captured
+            by cannibals! (From www.mobygames.com)
+        </description>
+        <screenshot>junglehunt1.png</screenshot>
+        <screenshot>junglehunt2.png</screenshot>
+        <screenshot>junglehunt3.png</screenshot>
+        <year>1984</year>
+    </game>
+
+    <game file="JUPITER.EXPRESS#060800" name="Jupiter Express" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="KANGORILLA#fc0801" name="Kangorilla" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="KINGTUT.REVENGE#060801" name="Kingtut Revenge" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LABYRINTH#0607fd" name="Labyrinth" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LASER.SILK#0607fd" name="Laser Silk" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LEMMINGS#0607fd" name="Lemmings" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LEMONADE#fc0801" name="Lemonade Stand" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LIFE#fc0801" name="Life" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LIFETIME#fc0801" name="Lifetime" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LIVEWIRE.PINBAL#06177d" name="Livewire Pinball" start="177d" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="LOST.TOMB#060801" name="Lost Tomb" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MADLIB#fc0801" name="Madlib" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MAPPLE#060801" name="Mapple" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MARIO.BROS#060801" name="Mario Bros" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MARS.CARS#0603fd" name="Mars Cars" start="03fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MIDWAY#fc0801" name="Midway" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MILLENIUM.LEAPE#060f00" name="Millenium Leaper" start="0f00" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MILLIPEDE#061f00" name="Millipede" start="1f00" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MINES.OF.MALZEB#0607fd" name="Mines of Malzeb" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MINIT.MAN#060801" name="Minit Man" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MONEYMUNCHERS#061000" name="Money Munchers" start="1000" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MONTEZUMA.RVNGE#0613f0" name="Montezuma's Revenge" start="13f0" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MOON.PATROL#060801" name="Moon Patrol" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MOUSKATTACK#060a00" name="MouskAttack" start="0a00" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MR.COOL#064000" name="Mr. Cool" start="4000" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="MS.PACMAN#060801" name="Ms. Pacman" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NARNIA#060800" name="Narnia" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NEPTUNE#060801" name="Neptune" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NIBBLE.INFERNO#fc0801" name="Nibble Inferno" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NIGHT.CRAWLER#060801" name="Night Crawler" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NIGHT.DRIVER#0607fa" name="Night Driver" start="07fa" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NIGHT.FLIGHT#060801" name="Night Flight" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NIGHT.MISSION#060801" name="Night Mission Pinball" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NIGHT.SURVIVAL#0607a5" name="Night Survival" start="07a5" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NIGHTMARE.GALLE#060600" name="Nightmare Gallery" start="0600" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NORAD#060800" name="Norad" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="NUKEWAR#fc0801" name="Nukewar" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ODESTA.ODIN#064000" name="Odesta Odin" start="4000" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ONE.ON.ONE#060801" name="One-on-One" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ORBITRON#0607fd" name="Orbitron" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ORILEYS.MINE#061600" name="Oriley's Mine" start="1600" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="OUTPOST#060801" name="Outpost" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="OUTWORLD#0627fd" name="Outworld" start="27fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PACMAN#060801" name="Pacman" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PALACE.IN.THUND#060800" name="Palace in Thunderland" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PANDORAS.BOX#060801" name="Pandora's Box" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PENGO#061cfd" name="Pengo" start="1cfd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PENSATE#0630fd" name="Pensate" start="30fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PEOPLE.PONG#06077d" name="People Pong" start="077d" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PEST.PATROL#060cfd" name="Pest Patrol" start="0cfd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PHANTOMS.FIVE#0607fd" name="Phantom's Five" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PHASER.FIRE#060801" name="Phaser Fire" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PHOTAR#0607fd" name="Photar" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PIEMAN#060800" name="Pieman" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PIG.PEN#060ffd" name="Pig Pen" start="0ffd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PIPE.DREAM#060800" name="Pipe Dream" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PIRATES.BALL#06177d" name="Pirates' Ball" start="177d" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PITFALL.2#060801" name="Pitfall II" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="POOYAN#060801" name="Pooyan" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PRECINCT.PATROL#064ce0" name="Precinct Patrol" start="4ce0" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PRO.GOLF#fc0801" name="Pro Golf" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PROCYON.WARRIOR#063ff8" name="Procyon Warrior" start="3ff8" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="PULSAR#061efd" name="Pulsar" start="1efd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="QUBIC#fc0801" name="Qubic" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="QUIBBLES.REVENG#060800" name="Quibble's Revenge" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="RASTER.BLASTER#060200" name="Raster Blaster" start="0200" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="REPTON#060801" name="Repton" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="REVERSAL#060800" name="Reversal" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="REVERSI#fc0801" name="Reversi" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="RIBBIT#060801" name="Ribbit" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="RINGS.OF.SATURN#060f00" name="Rings of Saturn" start="0f00" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ROBOTRON.2084#060801" name="Robotron 2084" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="ROCKET.COMMAND#061600" name="Rocket Command" start="1600" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="RTN.OF.GALAXIAN#060800" name="Return of Galaxian" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="SABOTAGE#060801" name="Sabotage" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>sabotage.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SANTA.PARAVIA#fc0801" name="Santa Paravia" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="SHOOTOUT.OKGALX#060801" name="Shootout at Ok Galaxy" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>shootout.png</screenshot>
+        <year/>
+    </game>
+
+    <game name="Sn0ggle" type="06">
+        <author/>
+
+
+        <description/>
+        <part action="subroutine" file="SN0GGLE.TITLE#061f00" name="Sn0ggle title" start="1f00" type="06"/>
+        <part action="run" file="SN0GGLE#0607fd" name="Sn0ggle game" start="07fd" type="06"/>
+        <screenshot>sn0ggle.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SNACK.ATTACK#060801" name="Snack Attack" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>snackattack.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SNAKEBYTE#fc0801" name="Snakebyte" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="SNEAKERS#0607fd" name="Sneakers" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>sneakers1.png</screenshot>
+        <screenshot>sneakers2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPACE.CADET#0603fd" name="Space Cadet" start="03fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>spacecadet.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPACE.EGGS#0615fd" name="Space Eggs" start="15fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>spaceeggs1.png</screenshot>
+        <screenshot>spaceeggs2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPACE.QUARKS#060801" name="Space Quarks" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>spacequarks1.png</screenshot>
+        <screenshot>spacequarks2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPACE.WARRIOR#0607fd" name="Space Warrior" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>spacewarrior.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPECIAL.SAMPLER#060800" name="Special Sampler" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>specialsampler.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPECTRE#060801" name="Spectre" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>spectre.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPY.HUNTER#060801" name="Spy Hunter" start="0801" type="06">
+        <author/>
+        <description/>
+
+        <screenshot>spyhunter1.png</screenshot>
+        <screenshot>spyhunter2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPY.STRIKES.BK#061700" name="Spy Strikes Back" start="1700" type="06">
+        <author/>
+        <description/>
+        <screenshot>spystrikesback1.png</screenshot>
+        <screenshot>spystrikesback2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SPYS.DEMISE#063f00" name="Spy's Demise" start="3f00" type="06">
+        <author/>
+        <description/>
+        <screenshot>spysdemise1.png</screenshot>
+        <screenshot>spysdemise2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STAR.AVENGER#060b00" name="Star Avenger" start="0b00" type="06">
+        <author/>
+        <description/>
+        <screenshot>staravenger1.png</screenshot>
+        <screenshot>staravenger2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STAR.BLAZER#060300" name="Star Blazer" start="0300" type="06">
+        <author/>
+        <description/>
+        <screenshot>starblazer.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STAR.CRUISER#062700" name="Star Cruiser" start="2700" type="06">
+        <author/>
+        <description/>
+        <screenshot>starcruiser.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STAR.THIEF#060800" name="Star Thief" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>starthief1.png</screenshot>
+        <screenshot>starthief2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STAR.TREK#060801" name="Star Trek" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>startrek1.png</screenshot>
+        <screenshot>startrek2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STAR.WARS.PART2#060801" name="Star Wars Part 2" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>starwarspt2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STARMAZE#0607fd" name="Starmaze" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>starmaze.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STARMINES#060800" name="Starmines" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>starmines1.png</screenshot>
+        <screenshot>starmines2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="Stellar7.dsk" name="Stellar 7" supportsKeyboard="1" supportsJoystick="1" supportsMouse="0" type="disk">
+        <author>Damon Slye / Software Entertainment Company</author>
+        <description>In Stellar 7, you drive the Raven, the most advanced Terran fighting vehicle. You are up against Gir Draxon and his evil Arcturan army. You will go from star system to star system, fighting his forces. (From www.mobygames.com)</description>
+        <screenshot>stellar71.png</screenshot>
+        <screenshot>stellar72.png</screenshot>
+        <year>1983</year>
+        <screenshot/>
+    </game>
+
+    <game file="STELLAR.INVADER#060a00" name="Stellar Invader" start="0a00" type="06">
+        <author/>
+        <description/>
+        <screenshot>stellarinvader.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="STUNT.CYCLE#061100" name="Stunt Cycle" start="1100" type="06">
+        <author/>
+        <description/>
+        <screenshot>stuntcycle.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SUCCESSION#064cfd" name="Succession" start="4cfd" type="06">
+        <author/>
+        <description/>
+        <screenshot>succession.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SUICIDE#060e00" name="Suicide" start="0e00" type="06">
+        <author/>
+        <description/>
+        <screenshot>suicide.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SUPER.HUEY#0617d5" name="Super Huey" start="17d5" type="06">
+        <author/>
+        <description/>
+        <screenshot>superhuey1.png</screenshot>
+        <screenshot>superhuey2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SUPER.INVADER#060280" name="Super Invader" start="0280" type="06">
+        <author/>
+        <description/>
+        <screenshot>superinvader1.png</screenshot>
+        <screenshot>superinvader2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SUPER.OTHELLO#061100" name="Super Othello" start="1100" type="06">
+        <author/>
+        <description/>
+        <screenshot>superothello.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SUPER.PUCKMAN#060800" name="Super Puckman" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>superpuckman.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SUPERFALCONS#0607e5" name="Superfalcons" start="07e5" type="06">
+        <author/>
+        <description/>
+        <screenshot>superfalcons1.png</screenshot>
+        <screenshot>superfalcons2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SWASHBUCKLER#060801" name="Swashbuckler" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>swashbuckler.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="SYZYGY#060800" name="SYZYGY" start="0800" type="06">
+        <author/>
+        <description/>
+        <screenshot>syzygy.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TAXMAN#060801" name="Taxman" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>taxman1.png</screenshot>
+        <screenshot>taxman2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TECHNOCAR.RACIN#060bf5" name="Technocar Racing" start="0bf5" type="06">
+        <author/>
+        <description/>
+        <screenshot>technocar.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TELENGARD#fc0801" name="Telengard" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="TETRAD#fc0801" name="Tetrad" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="TETRIS#060801" name="Tetris" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>tetris1.png</screenshot>
+        <screenshot>tetris2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TEXT.TRAIN#fc0801" name="Text Train" start="0801" type="fc">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game name="Thief" type="06">
+        <author/>
+
+
+        <description/>
+        <part action="load" file="THIEF.PIC#062000" name="Thief pic" start="2000" type="06"/>
+        <part action="run" file="THIEF.OBJ#063ffd" name="Thief obj" start="3ffd" type="06"/>
+        <screenshot>thief.png</screenshot>
+
+
+        <year/>
+    </game>
+
+    <game file="THRESHOLD#0607a7" name="Threshold" start="07a7" type="06">
+        <author/>
+        <description/>
+        <screenshot>threshold.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="THUNDERBIRD.GX#0607fb" name="Thunderbird GX" start="07fb" type="06">
+        <author/>
+        <description/>
+        <screenshot>thunderbird.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="THUNDERBIRDS#0607fd" name="Thunderbirds" start="07fd" type="06">
+        <author/>
+        <description/>
+
+        <screenshot>thunderbird.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="THUNDERBOMBS#061400" name="Thunderbombs" start="1400" type="06">
+        <author/>
+        <description/>
+        <screenshot>thunderbombs.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TOM.BOMBEM#060c00" name="Tom Bomb'em" start="0c00" type="06">
+        <author/>
+        <description/>
+        <screenshot>tombombem.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TORAX#060200" name="Torax" start="0200" type="06">
+        <author/>
+        <description/>
+        <screenshot>torax1.png</screenshot>
+        <screenshot>torax2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TRIAD#0607fd" name="Triad" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>triad.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TROMPERS#0602fd" name="Trompers" start="02fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>trompers1.png</screenshot>
+        <screenshot>trompers2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TRON#063ff0" name="Tron" start="3ff0" type="06">
+        <author/>
+        <description/>
+        <screenshot>tron1.png</screenshot>
+        <screenshot>tron2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TUBEWAY#060900" name="Tubeway" start="0900" type="06">
+        <author/>
+        <description/>
+        <screenshot>tubeway.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TUMBLE.BUGS#060801" name="Tumble Bugs" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>tumblebugs1.png</screenshot>
+        <screenshot>tumblebugs2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TUNNEL.TERROR#0607d0" name="Tunnel Terror" start="07d0" type="06">
+        <author/>
+        <description/>
+        <screenshot>tunnelterror.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="TYPE.ATTACK#0603fd" name="!Type Attack" start="03fd" type="06">
+        <author/>
+        <description/>
+        <screenshot/>
+        <year/>
+    </game>
+
+    <game file="VINDICATOR#061f50" name="Vindicator" start="1f50" type="06">
+        <author/>
+        <description/>
+        <screenshot>vindicator1.png</screenshot>
+        <screenshot>vindicator2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="VOPPER#061ffd" name="Vopper" start="1ffd" type="06">
+        <author/>
+        <description/>
+        <screenshot>vopper1.png</screenshot>
+        <screenshot>vopper2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="WAR.HEAD#0607fd" name="War Head" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>warhead.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="WARGLE#066000" name="Wargle" start="6000" type="06">
+        <author/>
+        <description/>
+        <screenshot>wargle.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="WARLORD#0607fd" name="Warlord" start="07fd" type="06">
+        <author/>
+        <description/>
+        <screenshot>warlord.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="XEVIOUS#060801" name="Xevious" start="0801" supportsKeyboard="false" supportsMouse="false" type="06">
+        <author/>
+        <description/>
+        <screenshot>xevious.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ZARGS#0607cd" name="Zargs" start="07cd" type="06">
+        <author/>
+        <description/>
+        <screenshot>zargs1.png</screenshot>
+        <screenshot>zargs2.png</screenshot>
+        <year/>
+    </game>
+
+    <game file="ZENITH#060801" name="Zenith" start="0801" type="06">
+        <author/>
+        <description/>
+        <screenshot>zenith.png</screenshot>
+        <year/>
+    </game>
+</games>

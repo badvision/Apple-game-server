@@ -1,0 +1,30 @@
+;Firmware routines specific to accessing slot-based RAM
+;Requires SLOT is defined before including!
+
+ADDR_PTR_L      = $c080 + (SLOT * 16)
+ADDR_PTR_M      = $c081 + (SLOT * 16)
+ADDR_PTR_H      = $c082 + (SLOT * 16)
+DATA            = $c083 + (SLOT * 16)
+BANK            = $c08F + (SLOT * 16)
+
+!macro		storeByte {
+                sta DATA
+}
+
+!macro		readByteInline {
+                    LDA DATA
+}
+;Reset the ram card's memory pointer to the start
+!macro      init {
+                    LDA #0
+                    STA ADDR_PTR_L
+                    STA ADDR_PTR_M
+                    STA ADDR_PTR_H
+}
+!macro      copyPage source {
+                    LDX #$00
+.1                  LDA source,x
+                    +storeByte
+                    INX
+                    bne .1
+}

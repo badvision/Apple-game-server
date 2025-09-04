@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Apple Game Server - FAQ</title>
+
+
+  <link title="general" rel="stylesheet" href="style.css" type="text/css">
+
+</head>
+
+
+<body>
+
+<div class="main">
+<div class="header">
+<h1>Apple // Game Server</h1>
+
+Play the classics on your Woz machine without a floppy disk!
+</div>
+
+<div class="top-nav">
+<li><a href="index.html">Home</a></li>
+
+<li><a href="status.html">Status</a></li>
+
+<li><a href="gettingstarted.html">Getting Started</a></li>
+
+<li><a href="faq.html">FAQ</a></li>
+
+<li><a href="http://developer.berlios.de/project/showfiles.php?group_id=6879">Download</a></li>
+
+<li><a href="details.html">Technical Details</a></li>
+
+<li><a href="http://developer.berlios.de/projects/a2gameserver/">Project
+Home</a></li>
+
+<li><a href="http://developer.berlios.de/project/make_donation.php?group_id=6879">donate!</a></li>
+
+</div>
+
+<div class="left-nav">
+<li><a href="#basics">Basics</a></li>
+
+<li><a href="#basics">Java Errors</a></li>
+
+</div>
+
+<div class="body">
+<a name="basics"></a>
+<div class="section">
+<h1>Basics</h1>
+
+<ul>
+
+  <li style="font-weight: bold;">I can't find what I'm
+looking for in this FAQ. &nbsp;What do I do now?</li>
+
+  <ul>
+
+    <li>Go to the forums associated with this project.
+&nbsp;Follow the
+"Project Home" link above and there you should be able to find the
+project forums. &nbsp;Either myself or other folks will be more
+than
+happy to try to help.</li>
+
+  </ul>
+
+  <li><span style="font-weight: bold;">Does this
+support disk images used in emulators? (e.g. .dsk, .do, .po files)</span></li>
+
+  <ul>
+
+    <li>Not yet.
+&nbsp;Support for standard dos 3.3 disks is about 2/3 finished.
+&nbsp;See the status page for progress updates on this subject.
+&nbsp;Right now only games contained in single files work because
+they
+require no interaction with the disk drive while running.</li>
+
+  </ul>
+
+  <li style="font-weight: bold;">How does this work
+exactly?</li>
+
+  <ul>
+
+    <li>See the "Technical Details" section for a better
+understanding of the inner workings.</li>
+
+  </ul>
+
+  <li style="font-weight: bold;">Why java? &nbsp;Why
+not C/C++/Pyton/Delphi?</li>
+
+  <ul>
+
+    <li>Because I don't like answering the question "When will
+you
+support [*nix | mac | win32 | ...]". &nbsp;Second to that, Java is
+what
+I use on a daily basis so my familiarity with it allows me to rapidly
+add new features.</li>
+
+    <li>Java is free and is already ported to many platforms, and
+as
+such it allows you to write cross-platform code that is both simple and
+elegant. &nbsp;Not that I want to knock Mono here, but I'm not
+interested in learning a java variant when I can use the real deal, and
+I have a strong dislike for C/C++.</li>
+
+  </ul>
+
+  <li><span style="font-weight: bold;">How do I
+add/remove games to the list?</span></li>
+
+  <ul>
+
+    <li>Easy! &nbsp;In the <span style="font-style: italic;">lib/data</span> directory
+you'll find a file named <span style="font-style: italic;">games.xml</span>.
+&nbsp;This file contains information about all games in the <span style="font-style: italic;">lib/data/games</span>
+subdirectory. &nbsp;The game file names have a specific pattern
+inherited from the CiderPress tool -- though the actual file names
+really don't matter because the information is captured in XML. The
+file pattern is NNNNNN#TTAAAA where N is a shortened game name without
+spaces, &nbsp;TT is the two-digit hexidecimal file type code (06 =
+binary, FC = basic) and AAAA is the four-digit starting address where
+the file should be loaded in the apple's main memory.
+&nbsp;Likewise,
+these values are also stored in the xml file. &nbsp;As this xml
+format
+grows, it will be described in the Technical Details section.</li>
+
+  </ul>
+
+  <li style="font-weight: bold;">Why do some games have an
+exclamation mark (!) in front of their names?</li>
+
+  <ul>
+
+    <li>Because those games were tested and deemed not working.
+&nbsp;So it's a warning to the user. &nbsp;For now, when you
+try to
+play one of these games it will still try to load the game, but instead
+of starting it directly it will ask you to press ctrl-reset to start it
+once it is loaded. &nbsp;This is so the apple firmware might reset
+other unknowns first. &nbsp;It may or may not work but I figure
+it's
+better than nothing.</li>
+
+  </ul>
+
+  <li style="font-weight: bold;">Why should I donate?</li>
+
+  <ul>
+
+    <li>Ultimately, this should be a personal decision you make
+for
+yourself. &nbsp;I'm not going to tell you one way or another if you
+should. &nbsp;However, please know that any donations received will
+help me obtain equipment and other retro gear so I can do additional
+testing and start other homebrew projects in the future. &nbsp;I'm
+not
+starving, but due to personal circumstances I have zero budget for
+non-discressionary spending at this point in time so it really helps in
+that sense. &nbsp;It's also a form of encouragement that the long
+sleepless hours are worth it to someone out there. &nbsp;:-)</li>
+
+  </ul>
+
+  <li style="font-weight: bold;">I can't donate money but
+I would like to help. &nbsp;What can I do?</li>
+
+  <ul>
+
+    <li>Hardware donations are greatly appreciated. &nbsp;A
+//c+, Laser
+128ex, eeprom burner, or a working dev board (ARM, Spartan FGPA, PIC --
+I'm not picky) would be nice. &nbsp;A CFFA would be beyond cool,
+but
+beggers can and will not be choosers in this case. &nbsp;(however,
+I
+can think of several things I will not be able to get much use out of,
+so let's talk about it first -- email me at <span style="font-style: italic;"><span style="font-weight: bold;">brendan.robert</span>[<span style="font-weight: bold;">at</span>]<span style="font-weight: bold;">gmail.</span>[remove_this]<span style="font-weight: bold;">com</span></span>)</li>
+
+    <li>I included over 200 games with this program and can't
+play them
+all. &nbsp;Also I can't test the ones that require a joystick
+because I
+no joystick (does this make me less of a man?) &nbsp;So if you
+encounter a game that doesn't work, please post about it on the forums
+so that hopefully it can be fixed or at least diagnosed.</li>
+
+    <li>If you have an unenhanced //e, ][+ or //gs, I would like
+if you
+could give this a shot on those computers and let me know how it goes.
+&nbsp;Again, post your findings on the forum -- it will help others
+who
+might run in to the same issues.</li>
+
+  </ul>
+
+  <li style="font-weight: bold;">What's the point of this
+project? &nbsp;Why are you doing this? &nbsp;Don't you have
+better things to do?</li>
+
+  <ul>
+
+    <li>Greetings, non-geek reader. &nbsp;(a real geek would
+never bother with such questions. You so-called <span style="font-style: italic;">"normal"</span>
+people know who you are ;-) &nbsp;The main goal is to play old
+retro
+apple games on actual retro apple hardware without using floppy disks.
+&nbsp;Mostly because I don't trust floppies, especially floppies
+that
+are old enough to legally buy alcohol and vote.</li>
+
+    <li>AppleWin and Kegs, among other emulators, are truly
+badass and
+more advanced that we could ever hope for. &nbsp;These projects are
+still being actively improved each month. &nbsp;However, <span style="font-weight: bold;">emulators will never be 100%
+exact replications of&nbsp;hardware</span>.
+&nbsp;As such, some games don't look exactly right or play as well
+as
+they do on hardware (e.g. money munchers by Bob Bishop). &nbsp;By
+all
+means, if your favorite game works in AppleWin already and you'e happy
+with that then good for you. &nbsp;Enjoy it. &nbsp;Let the
+AppleWin
+folks know what doesn't work (beyond that which they already know about
+like mouse support, true SSC support and cycle-accurate video display
+-- the bug list is growing smaller and smaller and we're very fortunate
+for that.)</li>
+
+    <li>Finally, there's a good ol' nostalgic feel having a //e
+hooked
+up to the TV with the way-too-loud internal speaker blaring the moon
+patrol theme. &nbsp;Either you dig it, or you don't. &nbsp;;-)</li>
+
+  </ul>
+
+</ul>
+
+</div>
+
+<a name="errors"></a>
+<div class="section">
+<h1>Java Errors<br>
+
+</h1>
+
+<ul>
+
+  <li>"java.lang.UnsatisfiedLinkError: no rxtxSerial in
+java.library.path"</li>
+  <ul>
+    <li>This means you did not add the lib directory to java's
+classpath. &nbsp;You can do so either by modifying the command-line
+syntax of how you are calling java (preferred method), or you can
+modify your environment variables to include the path.</li>
+    <li>It is also possible that you have already added the lib directory to the classpath, but have not downloaded the approriate <a href="http://users.frii.com/jarvi/rxtx/download.html">binary distribution of RXTX</a>
+for your platform and placed the files in there yet. &nbsp;The binary
+and lib releases of A2GameServer only include the win32 libraries.</li>
+  </ul>
+
+  <li>"Port X already in use" or "Port is not available"</li>
+
+  <ul>
+
+    <li>Either you picked the wrong serial port, you have another
+instance of this program running already, or something else is holding
+that resource and won't let go of it. &nbsp;An extreme situation I
+encountered was that I'm using a non-standard usb based serial port,
+which uses its own driver rather than the standard Windows one.
+&nbsp;When I enabled hardware flow control (in an older version of
+the
+code that didn't respect the rules of flow control), the java program
+froze in a deadlock. &nbsp;I couldn't force-quit the java program
+either. &nbsp;In fact, I couldn't even shut down without holding
+down
+the power button for 5 seconds! &nbsp;Also, whenever I tried to
+start
+the program again (before rebooting) I got the message that the port
+was already in use. &nbsp;If you are sure you're using the right
+port
+and no other serial-based programs are running, try to use another
+terminal program to use that port.</li>
+
+  </ul>
+
+  <li>"Cannot write X", "Expected X but timed out"</li>
+
+  <ul>
+
+    <li>This is because echo-check mode is enabled but the
+java
+program is likely not receiving data back from the apple. &nbsp;If
+you
+enable echo-check (<span style="font-weight: bold;">!echo
+true</span>
+in the init script) then you must ensure the apple is sending data to
+the PC (type pr#2 and test in a com program) -- you can either disable
+the echo-check mode (not recommended) or enable echo on the apple by
+typing this
+on the apple after IN#2:</li>
+
+    <ul>
+
+      <li>Ctrl-A (should then see a special prompt) 2S</li>
+
+    </ul>
+
+    <li>Note: The //c echoes received data to the serial port by
+default, whereas the SSC does not.</li>
+
+  </ul>
+
+  <li>"Expected X but got Y"</li>
+
+  <ul>
+
+    <li>The init or driver script have echo feedback mode enabled
+but
+is not receiving data back from the apple for some reason.
+&nbsp;This
+could be because of a difference in baud rate settings, or possible
+also that the apple is not set for 8 data bits, No parity and 1 stop
+bit.</li>
+
+  </ul>
+
+  <li>"Timed out waiting to send data to remote host!"</li>
+
+  <ul>
+
+    <li>This can only happen when hardware flow control is
+enabled. &nbsp;Make sure the apple needs flow control.
+&nbsp;Try <span style="font-weight: bold;">!flow XON</span>
+or <span style="font-weight: bold;">!flow NONE</span>
+as alternatives if necessary.</li>
+
+  </ul>
+
+  <li>"Failed to get response from driver after 3 retries"</li>
+
+  <ul>
+
+    <li>If echo-check mode is disabled (set by adding <span style="font-weight: bold;">!echo false </span>in the
+init.txt script) then this means the apple was never able to receive
+data well enough to start up the serial driver program. &nbsp;Check
+you can communicate with the apple using a regular serial communication
+program.</li>
+
+    <li>If the apple appears to be receiving data, check that the
+last line is 300g and not 30g. &nbsp;I've seen this last line get
+mangled a few times randomly. &nbsp;If you're quick on the draw,
+quickly type<span style="font-weight: bold;"> ctrl-x 300g
+(enter)</span> before the java program completely gives up.</li>
+
+  </ul>
+
+</ul>
+
+</div>
+
+</div>
+
+<div class="footer">&nbsp;Game Server was written by
+<a href="http://brendan.robert.googlepages.com/home">Brendan
+Robert</a>, CopyLeft(c) 2006. All Rights Reserved. &nbsp;Use
+and redistribution of
+this software is subject to the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU Public
+License</a>.</div>
+
+</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-665543-1";
+urchinTracker();
+</script>
+</body>
+</html>

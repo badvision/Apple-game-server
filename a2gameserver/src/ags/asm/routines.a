@@ -1,0 +1,7 @@
+!ifdef SSC {
+!source "ssc_routines.a"
+}
+
+!ifdef GS {
+!source "gs_routines.a"
+}

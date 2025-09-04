@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+  
+
+
+  
+  
+  
+  <title>Apple Game Server - Getting Started</title>
+  <link title="general" rel="stylesheet" href="style.css" type="text/css">
+</head>
+
+
+<body>
+
+
+
+<div class="main">
+<div class="header">
+<h1>Apple // Game Server</h1>
+
+
+
+Play the classics on your Woz machine without a floppy disk!
+</div>
+
+
+
+<div class="top-nav">
+<li><a href="index.html">Home</a></li>
+
+
+
+<li><a href="status.html">Status</a></li>
+
+
+
+<li><a href="gettingstarted.html">Getting Started</a></li>
+
+
+
+<li><a href="faq.html">FAQ</a></li>
+
+
+
+<li><a href="http://developer.berlios.de/project/showfiles.php?group_id=6879">Download</a></li>
+
+
+
+<li><a href="details.html">Technical Details</a></li>
+
+
+
+<li><a href="http://developer.berlios.de/projects/a2gameserver/">Project
+Home</a></li>
+
+
+
+<li><a href="http://developer.berlios.de/project/make_donation.php?group_id=6879">donate!</a></li>
+
+
+</div>
+
+
+
+<div class="left-nav">
+<li><a href="#connect">Connect</a></li>
+
+
+
+<li><a href="#java">Get Java</a></li>
+
+
+
+<li><a href="#download">Download</a></li>
+
+
+
+<li><a href="#setup">Setup</a></li>
+
+
+
+<li><a href="#run">Run</a></li>
+
+
+
+</div>
+
+
+
+<div class="body">
+<a name="connect"></a>
+<div class="section">
+<h1>Connect the Apple to a PC or Mac</h1>
+
+
+Connect your apple // (not a mac) to your PC/Mac with
+an appropriate null-modem serial cable.&nbsp; See this wonderful <a href="http://home.swbell.net/rubywand/Csa2T1TCOM.html">apple telecom FAQ</a> for more details.<br>
+
+<br>
+
+<span style="font-weight: bold;">Note: </span>It is highly recommended
+you test your serial connection is working such that you can send and
+receive data to and from the apple. &nbsp;For example, in Windows you
+can do this using Hyperterminal. &nbsp;The Apple Telecom FAQ above also
+has tips on how to go about testing this. &nbsp;Note the baud rate and
+flow control settings you used, as these will be important to getting
+the java program to talk to the Apple later on.
+<p>And finally, if you have a SSC refer to the FAQ for recommended dip
+switch settings if you are not too familiar with configuring the super
+serial card.<i> </i></p>
+
+
+
+</div>
+
+
+
+<a href="#connect">Back to top</a>
+<a name="java"></a>
+<div class="section">
+<h1>Obtain Java</h1>
+
+
+Install java and verify you can use it from the command line by
+typing "java -version" which should report java 1.5 similar (this will NOT work with java 1.4 or earlier!)
+<ul>
+
+
+  <li>Java 1.5 for Windows, Linux and Solaris is available directly from Sun: <a href="http://java.sun.com/j2se/1.5.0/download.jsp">http://java.sun.com/j2se/1.5.0/download.jsp</a></li>
+
+
+  <li>Java 1.5 for&nbsp; Mac OS X is available directly from Apple: <a href="http://www.apple.com/support/downloads/java2se50release1.html%20">http://www.apple.com/support/downloads/java2se50release1.html </a></li>
+
+
+</ul>
+
+
+
+</div>
+
+
+
+<a href="#connect">Back to top</a>
+<a name="download"></a>
+<div class="section">
+<h1>Download the apple game server</h1>
+
+
+Download the <a href="http://prdownload.berlios.de/a2gameserver/a2gameserver-binary-1.0.zip">latest binary release</a>. &nbsp;If you would like to see how the java or apple code
+sections work, feel free to grab the <a href="http://prdownload.berlios.de/a2gameserver/a2gameserver-source-1.0.zip">source files</a> as well.
+&nbsp;Decompress them all to the same base directory (the bundle
+packages should go in the <span style="font-style: italic;">/lib/data</span> directory and the binary should be mostly contained in the <span style="font-style: italic;">/dist</span> directory.)<br>
+
+
+The binary distribution contains a Win32 build of the <a href="http://www.rxtx.org/">RXTX library</a>. &nbsp;If you're using windows, go on to the next step.<br>
+
+
+<br>
+
+
+If you are using Linux, Mac OSX, or Solaris (really?) then you should
+get the appropriate port of the rxtx native libraries for your platform
+from <a href="http://users.frii.com/jarvi/rxtx/download.html">here</a>. &nbsp;Once you've obtained the compiled libraries, place them in the <span style="font-style: italic;">lib</span> directory (and you can chuck out the win32 libraries since you're not worshiping the evil empire today)
+</div>
+
+
+
+<a href="#connect">Back to top</a>
+<a name="setup"></a>
+<div class="section">
+<h1>Set up the game server</h1>
+
+In the <span style="font-style: italic;">lib/data</span> subdirectory there is a file called <span style="font-style: italic;">init.txt.</span>
+&nbsp;This is a regular text file tht can be modified to suit your
+setup as you see fit. &nbsp;The first character of each line signifies
+a specific way in which that line should be interpreted. &nbsp;This
+behavior is explained in greater detail in the&nbsp;<span style="font-style: italic;">Technical Details</span> section. &nbsp;Lines 16-21 are of greater importance when you're getting acquainted:<br>
+
+<div style="margin-left: 40px;">
+<pre>; Change this statement to the appropriate flow control<br>; (for //e,//gs use HARDWARE or (maybe) XON, for //C use NONE)</pre>
+
+<pre>!flow HARDWARE</pre>
+
+<pre>; Change this statement to the baud rate your machine defaults to</pre>
+
+<pre>!goto try19200</pre>
+
+</div>
+
+The <span style="font-style: italic;">!flow</span> <span style="font-style: italic;"><span style="font-style: italic;">&nbsp;</span></span>command
+instructs the java program what type of flow control to use when
+communicating with the apple. &nbsp;When you tested your connection
+previously (you did this, right? ;-) you should have been able to
+determine what setting worked best for your computer. &nbsp;If not, you
+can try one of the recommended settings (and if you have to guess you
+have a 1 in 3 chance of getting it right anyway)<br>
+
+<br>
+
+The <span style="font-style: italic;">!baud</span> command sets the
+java program's local baud rate. &nbsp;(The apple's baud rate must be
+set by sending code to the apple to reconfigure itself, which is why
+the apple's inital baud rate and flow control must be known upfront.)<br>
+
+<br>
+
+The <span style="font-style: italic;">driver.txt</span> file is explained in detail in the<span style="font-style: italic;"> technical details</span> page. &nbsp; You shouldn't have to worry about it.
+</div>
+
+
+
+<a href="#connect">Back to top</a>
+<a name="run"></a>
+<div class="section">
+<h1>Run the game server program</h1>
+
+
+Boot the apple computer and press ctrl+reset to get to the basic prompt
+(you should see a ] and a blinking checkerboard cursor).&nbsp; Type (<i>or mutter as an incantation if you listen to RetroBits</i>)
+IN#2 and press return.&nbsp; The cursor will reappear, just leave it
+alone. &nbsp;If you are using an apple computer with a super serial
+card, type CTRL-A 2S so that the super serial card will echo typed
+characters back to the host computer.<br>
+
+
+<br>
+
+
+On the pc/mac, enter a command shell (For example: start -&gt; run
+-&gt; cmd.exe (enter)) and go into the project directory and type:
+<p><b>java -Djava.library.path=lib -cp lib;lib/RXTXcomm.jar;dist/DiskServer.jar Diskserver <i>COM2</i></b><b>&nbsp;</b></p>
+
+
+<p>(where
+COM2 means you have already connected the apple to your pc's COM2 port
+-- you can change this to any com port or what best suits your
+environment.)</p>
+
+
+<p><b>For Linux / Mac:</b> </p>
+
+
+<p>Assuming the user has permissions to access the serial port (in this
+case, <i>ttyS0</i> being the equivalent of <i>COM1 </i>under Windows), running thiscommand in the project's directory starts it up fine.</p>
+
+
+<p><b>java -Djava.library.path=lib -cp<br>
+
+
+lib:lib/RXTXcomm.jar:dist /DiskServer.jar Diskserver <i>/dev/ttyS0</i></b><br>
+
+
+</p>
+
+
+<p>(Thanks to TJ Nardi for letting me know how to run it on Linux!&nbsp; Go Java!)&nbsp;</p>
+
+
+<p>If all goes well, you should see a menu of games appear on the apple
+within a minute or so. &nbsp;If the startup process is not successful,
+you should see some sort of error from the java program. &nbsp;Refer to
+the FAQ for help on common error messages.</p>
+
+
+
+</div>
+
+
+
+<a href="#connect">Back to top</a>
+</div>
+
+
+
+<div class="footer">&nbsp;Game
+Server was written by <a href="http://brendan.robert.googlepages.com/home">Brendan
+Robert</a>, CopyLeft(c) 2006. All Rights Reserved. &nbsp;Use
+and redistribution of this software is subject to the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU Public
+License</a>.</div>
+
+
+
+</div>
+
+
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-665543-1";
+urchinTracker();
+</script>
+</body>
+</html>

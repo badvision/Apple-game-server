@@ -1,0 +1,36 @@
+;Firmware routines specific to the Super Serial Card and //c firmware
+;Requires SLOT is defined before including!
+
+ACIA_Data       = $c088 + (SLOT * 16)
+ACIA_Status     = $c089 + (SLOT * 16)
+ACIA_Command    = $c08a + (SLOT * 16)
+ACIA_Control    = $c08b + (SLOT * 16)
+
+!macro		sendByteInline {
+                    LDA #$10
+.sendloop
+                    BIT ACIA_Status
+                    BEQ .sendloop
+                    STX ACIA_Data
+}
+
+!macro		readByteInline {
+                    ;Poll for next byte
+                    LDA #$08
+.readLoop
+                    BIT ACIA_Status
+                    BEQ .readLoop
+                    LDA ACIA_Data
+}
+;Used whenever we're wanting to use the serial port
+!macro      initSerialCard {
+                    LDA #%00010000      ;init serial port to 115200, no interrupts, 8 data bits, 1 stop bit
+                    STA ACIA_Control
+                    LDA #%00001011      ; No Parity, RTS low, DTR on, disable IRQ (& //c keyboard buffer)
+                    STA ACIA_Command
+}
+
+;Used whenever we're done with the serial port
+!macro      resetSerialCard {
+;TODO: Anything?
+}

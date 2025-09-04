@@ -1,0 +1,226 @@
+echo "You must specify which script target you want to execute, either apple2e or apple2c"
+echo "If you don't want to specify this on the commandline every time, modify the init.txt script."
+;-----------------------------------------------------
+[init]
+; These are general settings that affect all script targets
+;Turn on the echo-check mode (set to false if you want it to slow down a lot)
+echoCheck true
+; Assume either SSC in slot 2 or GS Modem port
+set "SSC Slot / GS Port Number" slot 2
+set "echo command" enableEcho "PR#{slot}"
+
+[testConnection]
+baud 115200
+;Send the acknowledge request to the driver
+echo "Checking to see if AGS Driver is already running"
+sendTextBlind "@" *
+;If the next part fails, then jump to the pre-defined error handler
+;See if the driver is already running (if not it will throw an error)
+expect "hi" 500
+echo "Driver already running, no need to bootstrap"
+jump END
+
+;-----------------------------------------------------------------
+[Apple2]
+; Normal startup using echo
+require init
+onError apple2_setup
+call testConnection
+
+[apple2_setup]
+legacyMode true
+flow hardware
+baud 19200
+onError INIT_2_ERROR
+jump apple2_standard
+
+[Apple2_debug]
+; Debug startup using no echo
+require init
+echoCheck false
+set "echo command" enableEcho ""
+onError apple2_setup_debug
+call testConnection
+
+[apple2_setup_debug]
+legacyMode true
+flow hardware
+baud 19200
+onError INIT_2_ERROR
+jump apple2_standard_debug
+
+;-----------------------------------------------------------------
+[Apple2e]
+; Normal startup using echo
+require init
+onError apple2e_setup
+call testConnection
+
+[apple2e_setup]
+flow hardware
+baud 19200
+onError INIT_2_ERROR
+jump apple2_standard
+
+[Apple2e_debug]
+; Debug startup using no echo
+require init
+echoCheck false
+set "echo command" enableEcho ""
+onError apple2e_debug_setup
+call testConnection
+
+[apple2e_debug_setup]
+flow hardware
+baud 19200
+onError INIT_2_ERROR
+jump apple2_standard_debug
+
+;-----------------------------------------------------------------
+[Apple2c]
+; Normal startup using echo
+require init
+onError apple2c_setup
+call testConnection
+
+[apple2c_setup]
+flow none
+baud 300
+onError INIT_2C_ERROR
+jump apple2_standard
+
+[Apple2c_debug]
+; Debug startup using no echo
+require init
+echoCheck false
+set "echo command" enableEcho ""
+onError apple2c_debug_setup
+call testConnection
+
+[apple2c_debug_setup]
+flow none
+baud 300
+onError INIT_2C_ERROR
+jump apple2_standard_debug
+
+;-----------------------------------------------------------------
+[apple2_standard]
+set "Driver Variation" driver "ssc_slot{slot}"
+jump bootstrap
+
+;-----------------------------------------------------------------
+[apple2_standard_debug]
+set "Driver Variation" driver "ssc_slot{slot}"
+jump bootstrap_debug
+
+;-----------------------------------------------------------------
+[Apple2gs]
+; Normal startup using echo
+require init
+onError apple2gs_setup
+call testConnection
+
+[apple2gs_setup]
+flow hardware
+;default port settings 1200,8,n,1
+baud 1200
+onError INIT_2GS_ERROR
+set "Driver Variation" driver "gs_port{slot}"
+jump bootstrap
+
+[Apple2gs_debug]
+; Debug startup using no echo
+require init
+echoCheck false
+set "echo command" enableEcho ""
+onError apple2gs_debug_setup
+call testConnection
+
+[apple2gs_debug_setup]
+flow hardware
+;default port settings 1200,8,n,1
+baud 1200
+onError INIT_2GS_ERROR
+set "Driver Variation" driver "gs_port{slot}"
+jump bootstrap_debug
+
+;-----------------------------------------------------------------
+; The main bootstrapping routine starts here...
+;-----------------------------------------------------------------
+[bootstrap]
+onError DRIVER_ERROR
+sendTextBlind "{enableEcho}"
+sendTextBlind ""
+;Now we know the current apple speed, kick it into overdrive (115.2k baud)
+expectPrompt *
+sendText "CALL -151"
+
+echo "Changing port speed"
+;This binary code kicks the serial port into 115.2k baud, 8-N-1
+sendBinary ags/asm/init_{driver}.o 300
+expectPrompt ""
+sendText "300G"
+;Extra linefeed just in case!
+sendTextBlind ""
+;Now change our speed to match the apple's
+baud 115200
+;Give the apple a moment to catch up
+wait 750
+;Expect a valid monitor prompt before going on!
+expectPrompt *
+sendText ""
+jump stage2
+
+; Debug doesn't jump to 115200 baud right away
+; It's slower but more reliable overall, especially on the //c
+[bootstrap_debug]
+expectPrompt ]
+sendText ""
+expectPrompt *
+sendText "CALL -151"
+jump stage2
+
+[stage2]
+;-----------------------------------------------------------------
+;This part loads the SOS driver to the apple's ram by typing it in one byte at a time
+onError DRIVER_ERROR
+echo "Sending driver"
+sendMessage "LOADING DRIVER"
+;type in the program now.
+;Set this to the version you want to use
+sendBinary ags/asm/sos_hi_{driver}.o 800
+;Now execute the driver.  Note: The first byte at $800 is unused for disk loader support.
+expectPrompt false
+sendText "801G"
+baud 115200
+echo "The driver has been transferred -- Bootstrap process is complete!"
+jump END
+;-----------------------------------------------------------------
+[INIT_2_ERROR]
+echo "Could not communicate with Apple!  Make sure its port settings are No parity, 8 data bits and 1 stop bit (N-8-1) and DTR (hardware) flow control active."
+echo "Set the default baud rate to 19200 on your card and use a telecom program to test the settings are correct if it still isn't working."
+set "Bootstrap error" error "init"
+jump END
+;-----------------------------------------------------------------
+[INIT_2C_ERROR]
+echo "Could not communicate with Apple!  Make sure its port settings are No parity, 8 data bits and 1 stop bit (N-8-1)."
+echo "Make sure you are using the modem port on the floppy-disk side of the computer.  Also leave the settings to their power-on defaults (300 baud)"
+set "Bootstrap error" error "init"
+jump END
+;-----------------------------------------------------------------
+[INIT_2GS_ERROR]
+echo "Could not communicate with Apple!  Make sure its port settings are defaults: 1200 baud, No parity, 8 data bits and 1 stop bit (N-8-1) and default DTR flow control."
+echo "Make sure you are using the modem port (phone icon) not the printer port."
+set "Bootstrap error" error "init"
+jump END
+;-----------------------------------------------------------------
+[DRIVER_ERROR]
+echo "Was not able to load driver due to unrecoverable communication errors.  If you need to contact the author for assistance, please include the full copy of this log in your email."
+set "Bootstrap error" error "driver"
+jump END
+
+[END]
+;This is the end of the script... nothing interesting happens here.  
+;Hopefully you got here on good terms.  If not, reboot and try again.
+;And if that doesn't work, wrap a towel around your head.
+;It might not help, but it may make you feel better as Vogons destroy the planet.

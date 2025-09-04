@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Apple Game Server - Tech. Details</title>
+
+
+  <link title="general" rel="stylesheet" href="style.css" type="text/css">
+
+</head>
+
+
+<body>
+
+<div class="main">
+<div class="header">
+<h1>Apple // Game Server</h1>
+
+Play the classics on your Woz machine without a floppy disk!
+</div>
+
+<div class="top-nav">
+<li><a href="index.html">Home</a></li>
+
+<li><a href="status.html">Status</a></li>
+
+<li><a href="gettingstarted.html">Getting Started</a></li>
+
+<li><a href="faq.html">FAQ</a></li>
+
+<li><a href="http://developer.berlios.de/project/showfiles.php?group_id=6879">Download</a></li>
+
+<li><a href="details.html">Technical Details</a></li>
+
+<li><a href="http://developer.berlios.de/projects/a2gameserver/">Project
+Home</a></li>
+
+<li><a href="http://developer.berlios.de/project/make_donation.php?group_id=6879">donate!</a></li>
+
+</div>
+
+<div class="left-nav">
+<li><a href="#overview">Overview</a></li>
+
+<li><a href="#commands">Commands</a></li>
+
+<li><a href="#sos">SOS Driver</a></li>
+
+</div>
+
+<div class="body">
+<a name="overview"></a>
+<div class="section">
+<h1>Program Overview</h1>
+
+Prior to executing the java program, the apple // computer must be
+connected, powered on, and expecting input (via typing in#2 at the
+basic prompt.) &nbsp;Once you've typed IN#2, the apple SSC firmware
+(or equivilant firmware in the rom of the //gs or //c) takes over the
+normal keyboard input routine and starts listening on the serial port
+for input <span style="font-style: italic;">in addition to</span>
+the normal keyboard input. &nbsp;Therefore, whatever is connected
+to the serial port can&nbsp;gain remote control over the apple's
+keyboard and type stuff in really fast -- well, at least fast compared
+to how I type anyway.&nbsp; ;-) &nbsp;So now the apple is
+listening for input, we can now start the java program.<br>
+
+<br>
+
+The first phase of the java program is contained in two script files,
+init.txt and driver.txt, which contain all the necessary logic for
+getting the apple ready for higher speed communication. &nbsp;Very
+simply, a short pre-assembled apple program (nicknamed SOS, for Serial
+Operating System) is typed in one byte at a time over the serial cable
+and then executed on the apple.<br>
+
+<br>
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;">Note: </span>
+The init phase is where the bulk of problems are experienced, because
+of the possibility of misconfiguration or a damaged serial cable.
+&nbsp;Because of this, it is very important to check the link works
+bi-directionally first using a normal communications program like
+HyperTerminal (or whatever is relevant to your OS -- feel free to share
+your opinions on this in the forums.) &nbsp;Whatever error messages
+can be thrown by the java program are described in the FAQ section.
+</div>
+
+<br>
+
+Once the driver program has been entered in memory, it is executed by
+the final line of driver.txt: "300g". &nbsp;Once the driver starts,
+the java program can gain more direct
+control over the apple to perform specific functions. &nbsp;The
+first thing that happens is an ackowledgement test. &nbsp;The java
+program sends an @ (at) character to the apple. &nbsp;The Apple, if
+working properly at this point, should respond with "hi". &nbsp;If
+the test succeeds, an entire application starts executing inside of the
+java program, using the apple as the display and keyboard input,
+basically turning the apple into a dumb terminal.<br>
+
+<span style="font-weight: bold;"><br>
+
+Main Loop: </span>The java program prepares a virtual screen
+buffer in its own memory space and then sends it over (1kb total) to
+the apple, instructing the apple to store the data directly in its text
+screen buffer ($400). &nbsp;After the screen is sent, the java
+program then tells the apple to wait for a keypress. &nbsp;If the
+apple receives a keypress it sends it back. &nbsp;(if not, it sends
+back a negative response -- this is used to verify the connection is
+unbroken) &nbsp;If the keypress is understood by the java program,
+it responds to it&nbsp;and then updates its virtual screen buffer
+and then sends the screen back to the apple. &nbsp;This whole
+process loops until the user selects a game.<br>
+
+<br>
+
+Once the game is selected, the java program sends the binary of the
+game file over and then instructs the driver to start executing it.
+&nbsp; After that, the java program disconnects and exits and the
+apple is (hopefully) now playing a game.
+</div>
+
+<a name="commands"></a>
+<div class="section">
+<h1>Script Commands</h1>
+
+The init.txt and driver.txt files are interpreted scripts that contain
+all the necessary setup commands and apple program code necessary to
+get the apple to communicate with the java program more directly.
+&nbsp;These scripts may be found in the lib/data directory.
+&nbsp;The <span style="font-style: italic;">ags.communications.GenericHost</span>
+class is where the script interpreter lives for now.<br>
+
+The <span style="font-style: italic;">init.txt</span>
+script is executed first to set up the basic parameters of the program
+and get the apple ready to receive the driver program code.
+&nbsp;If the init.txt script is successful, the <span style="font-style: italic;">driver.txt</span> script
+is executed to enter and start the driver program.<br>
+
+<br>
+
+When a script is executed, it is interpreted top-down starting at the
+first line. &nbsp;The punctuation symbols at the beginning of each
+line control the script flow and how data should be sent to the apple.<br>
+
+<br>
+
+<span style="font-weight: bold;">Script Key:</span><br>
+
+<ul>
+
+  <li><span style="font-weight: bold;">(none)</span>&nbsp;The
+line is typed with echo-check enabled and no prompt response
+expected</li>
+
+  <li><span style="font-weight: bold;">~ (tilde)</span>&nbsp;The
+line is blindly typed (no echo-check enabled) and no prompt
+response expected</li>
+
+  <li><span style="font-weight: bold;">* (asterisk)</span>&nbsp;The
+line is typed with echo-check enabled and expects a monitor
+prompt in response</li>
+
+  <li><span style="font-weight: bold;">]
+(left-bracket)</span>&nbsp;The line is typed with echo-check
+enabled
+and expects a basic prompt in response</li>
+
+  <li><span style="font-weight: bold;">"
+(double-quote)</span>&nbsp;The line is echoed out to the
+apple's
+screen, implicitly expects a monitor prompt afterwards</li>
+
+  <li><span style="font-weight: bold;">'
+(single-quote)</span>&nbsp;The line is echoed out to the user
+(java)
+through stdout</li>
+
+  <li><span style="font-weight: bold;">!
+(exclamation)</span>&nbsp;This is a command for the java
+program to
+interpret, not to be typed (see java program commands below)</li>
+
+  <li><span style="font-weight: bold;">: (colon)</span>&nbsp;This
+is a label for the java progrram, not to be typed</li>
+
+  <li><span style="font-weight: bold;">; (semi-colon)</span>&nbsp;The
+line is a comment and is ignored</li>
+
+</ul>
+
+<span style="font-weight: bold;">Accepted java program
+commands <span style="font-style: italic;">(used with the
+! symbol):</span></span>
+<br>
+
+<ul>
+
+  <li><span style="font-weight: bold;">baud <span style="font-style: italic;">rate</span>&nbsp; </span>Set
+the local machine's baud rate to the specified number</li>
+
+  <li><span style="font-weight: bold;">flow <span style="font-style: italic;">NONE|HARDWARE|XON</span>
+&nbsp;</span>Set the local machine's flow control mode</li>
+
+  <li><span style="font-weight: bold;">onerror <span style="font-style: italic;">label-name</span></span>
+&nbsp;If an error is encountered, jump to the specified label in
+this script
+(throws the error if the label is not found)</li>
+
+  <li><span style="font-weight: bold;">goto <span style="font-style: italic;">label-name</span>&nbsp;
+Jump directly to the specified label (throws an error if the label is
+not found)</span></li>
+
+  <li><span style="font-weight: bold;">wait <span style="font-style: italic;">milliseconds</span>&nbsp;</span>
+Pause the specified number of milliseconds before going on.</li>
+
+  <li><span style="font-weight: bold;">expect&nbsp;<span style="font-style: italic;">true|false</span>&nbsp;</span>
+Enable/disable <span style="font-style: italic;">echo-check</span></li>
+
+</ul>
+
+<span style="font-weight: bold;">About the "echo-check"
+mode: </span><span style="font-style: italic;">Echo-check</span>
+mode is a way to verify that the apple is receiving data.
+&nbsp;This requires that the apple can support this. &nbsp;//c
+firmware does
+this by default, but the SSC firmware in a //e probably does not.
+&nbsp;(You can
+enable this on the //e by typing "CTRL+A 2 S" after typing IN#2 --
+without the spaces). &nbsp;Echo check forces the java program to
+wait for data sent from the java program to echo back from the apple
+before
+entering another character.<br>
+
+If the echo check fails, the java program will throw an error
+indicating the apple is not
+communicating correctly. &nbsp;This is how baud rate detection
+works,
+because a failure of echo-checking means the baud rates don't match up.
+&nbsp;However, with echo-check mode disabled the baud rate
+detection will not work because there will not be a communication error
+until the very
+end once the java program has already tried to send over and execute
+the driver program</div>
+
+<a href="#overview">back to top</a>
+<a name="sos"></a>
+<div class="section">
+<h1>Serial Operating System (SOS)</h1>
+
+SOS is the apple driver program that allows the java progam to take
+total control.
+Until SOS is instructed to execute a program, it runs its own simple
+main loop:<br>
+
+<ol>
+
+  <li>Wait for input "command" character from remote host (java
+program)</li>
+
+  <li>Pick appropriate subroutine for command and execute it (if
+command was not understood, it just beeps the apple speaker)</li>
+
+  <li>Unless the program execute command (E) was called, jump
+back to step 1.</li>
+
+</ol>
+
+There are only a small number of commands that are accepted:<br>
+
+<ul>
+
+  <li><span style="font-weight: bold;">@</span>
+&nbsp;Acknowledge request -- apple responds back with "hi"</li>
+
+  <li><span style="font-weight: bold;">A</span>
+&nbsp;Set target address for execution or for data download</li>
+
+  <li><span style="font-weight: bold;">B</span>
+&nbsp;Set data download size</li>
+
+  <li><span style="font-weight: bold;">C</span>
+&nbsp;Receive n bytes of data (as set by B) and store them starting
+at address specified by A -- calculates checksum as it downloads</li>
+
+  <li><span style="font-weight: bold;">D</span>
+&nbsp;Request calculated checksum value (apple replies back with a
+one-byte checksum value, an XOR of all received bytes from C)</li>
+
+  <li><span style="font-weight: bold;">E</span>
+&nbsp;Execute program at target address specified by A</li>
+
+  <li><span style="font-weight: bold;">F</span>
+&nbsp;Wait a little while for keypress and respond back with value.
+&nbsp;(&gt;=128 means key was pressed, &lt; 128 means no
+key was pressed)</li>
+
+</ul>
+
+That is basically it for the apple side of things. &nbsp;The game
+selection menu actually resides inside the java program and uses a
+combination of these commands to make the apple look like it is running
+the program (nice illusion, isn't it?)
+</div>
+
+<a href="#overview">back to top</a>
+</div>
+
+<div class="footer">&nbsp;Game Server was written by
+<a href="http://brendan.robert.googlepages.com/home">Brendan
+Robert</a>, CopyLeft(c) 2006. All Rights Reserved. &nbsp;Use
+and redistribution of
+this software is subject to the terms of the <a href="http://www.gnu.org/copyleft/gpl.html">GNU Public
+License</a>.</div>
+
+</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-665543-1";
+urchinTracker();
+</script>
+</body>
+</html>

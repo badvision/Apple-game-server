@@ -1,0 +1,5 @@
+!cpu 6502
+!source "routines.a"
+*=$300
++initSerialCard
+RTS

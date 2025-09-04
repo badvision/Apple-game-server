@@ -1,0 +1,27 @@
+!source "routines.a"
+MEMMOVE         = $FE2C
+MAIN_START      = $BEFF
+
+*=MAIN_START - $20
+!pseudopc $800 {
+                    !byte $01
+                    ldy #$00
+                    sta $C0E8	; Stop drive motor
+;Relocate code to $BEFF to get out of the way of most single-load games
+                    lda #<.loaderEnd
+                    sta $3c
+                    lda #$ff
+                    sta $3E		; Even if the driver is not quite all the way to $8ff, who cares?
+                    sta $42     ; By setting destination to $beff, I make use of the fact that A=FF already
+                    lda #$08
+                    sta $3d
+                    sta $3f
+                    lda #$BE
+                    sta $43
+                    jsr MEMMOVE
+                    jmp MAIN_START
+.loaderEnd
+}
+*=MAIN_START
+!source "sos/sos_main.a"
+MAIN_END

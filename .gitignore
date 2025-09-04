@@ -1,0 +1,7 @@
+.svn/
+*.class
+*.jar
+target/
+build/
+.DS_Store
+*.log

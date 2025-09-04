@@ -1,0 +1,31 @@
+!cpu 6502
+!source "routines.a"
+*=$25C
+
+BUFFER_PTR    =      $26 ;and $27
+TRACK      =        $41       ; start track
+SECTOR     =        $3D       ; start sector
+
+TSTRERD
+                LDY #BUFFER_PTR
+                LDA #$00
+                LDX #(TRACK-BUFFER_PTR+1)
+!macro  rwtsExit {
+                INC BUFFER_PTR+1 ;Just crossed page boundary, so kick up
+                                 ;the hi byte of the target address.
+                INC SECTOR       ;Set value for next sector wanted.
+                LDA SECTOR       ;Get next sector wanted.
+                CMP $800         ;Test if read enough sectors.
+                                 ;First byte of image of BOOT1 normally
+                                 ;contains #$01 which denotes only 1 sector
+                                 ;(sec0/trk0) should be read in by BOOT0.
+;               BCC TSTRERD      ;Branch back to read more sectors.
+                BCS BOOT
+                JMP TSTRERD
+BOOT            LDY #$00         ;assert normal $C600 X & Y reg values
+                LDX $2B          ;(x) = slot *16.
+                JMP $801         ;Jumps into BOOT1 (which was copied into
+                                 ;page 8 from trk0/sec0) to begin execution
+                                 ;of BOOT1.
+}
+!source "rwts/rwts_main.a"

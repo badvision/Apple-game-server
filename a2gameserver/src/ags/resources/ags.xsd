@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://badvision.org"
+    xmlns:tns="http://badvision.org"
+    elementFormDefault="qualified">
+    <xsd:element name="games">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="tns:game" maxOccurs="unbounded" minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="game">
+        <xsd:annotation>
+            <xsd:documentation>Describes a game as a single file to be executed, a series of parts (see part), or a collection of disks</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+<!--            <xsd:attribute name="start" type="xsd:hexBinary" use="optional"> -->
+            <xsd:complexContent>
+                <xsd:extension xmlns:tns="http://badvision.org" base="tns:gameBase">
+                    <xsd:sequence>
+                        <xsd:element name="author" minOccurs="0">
+                            <xsd:annotation>
+                                    <xsd:documentation>
+                            Name of author and/or publisher
+                        </xsd:documentation>
+                                </xsd:annotation>
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string"/>
+                                </xsd:simpleType>
+                        </xsd:element>
+                        <xsd:element name="description" maxOccurs="1" minOccurs="0">
+                            <xsd:annotation>
+                                    <xsd:documentation>Description of game</xsd:documentation>
+                                </xsd:annotation>
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string"/>
+                                </xsd:simpleType>
+                        </xsd:element>
+                        <xsd:element name="part" maxOccurs="unbounded" minOccurs="0" type="tns:part" xmlns:tns="http://badvision.org"></xsd:element>
+                        <xsd:element name="screenshot" maxOccurs="unbounded" minOccurs="0">
+                            <xsd:annotation>
+                                    <xsd:documentation>One or more screenshot images for game.  File must be relative to the xml file's location</xsd:documentation>
+                                </xsd:annotation>
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string"/>
+                                </xsd:simpleType>
+                        </xsd:element>
+                        <xsd:element name="year" minOccurs="0">
+                            <xsd:annotation>
+                                    <xsd:documentation>Year that game was published</xsd:documentation>
+                                </xsd:annotation>
+                                <xsd:simpleType>
+                                    <xsd:restriction base="xsd:string"/>
+                                </xsd:simpleType>
+                        </xsd:element>
+                        <xsd:element name="disk" maxOccurs="unbounded" minOccurs="0">
+                            <xsd:complexType>
+                                    <xsd:sequence/>
+                                        <xsd:attribute name="name" type="xsd:string" use="required">
+                                            <xsd:annotation>
+                                                    <xsd:documentation>Name of disk image (e.g. player disk, save disk)</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:attribute>
+                                        <xsd:attribute name="file" type="xsd:string" use="required">
+                                            <xsd:annotation>
+                                                    <xsd:documentation>file containing disk image</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:attribute>
+                                        <xsd:attribute name="slot" type="xsd:int">
+                                            <xsd:annotation>
+                                                    <xsd:documentation>Preferred slot for disk</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:attribute>
+                                        <xsd:attribute name="drive" type="xsd:int">
+                                            <xsd:annotation>
+                                                    <xsd:documentation>Preferred drive for disk</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:attribute>
+                                        <xsd:attribute name="volume" type="xsd:int">
+                                            <xsd:annotation>
+                                                    <xsd:documentation>Preferred DOS 3.3 volume for disk</xsd:documentation>
+                                                </xsd:annotation>
+                                        </xsd:attribute>
+                                </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="supportsKeyboard" type="xsd:boolean">
+                        <xsd:annotation>
+                                <xsd:documentation>Supports keyboard?  If unspecified, then "unknown" is assumed</xsd:documentation>
+                            </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="supportsJoystick" type="xsd:boolean">
+                        <xsd:annotation>
+                                <xsd:documentation>Supports joystick?  If unspecified, then "unknown" is assumed</xsd:documentation>
+                            </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="supportsMouse" type="xsd:boolean">
+                        <xsd:annotation>
+                                <xsd:documentation>Supports mouse?  If unspecified, then "unknown" is assumed</xsd:documentation>
+                            </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:simpleType name="hex">
+        <xsd:annotation>
+            <xsd:documentation>Any hexadecimal number that is between 1 and 4 digits long, case insensitive</xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string"/>
+            </xsd:simpleType>
+            <xsd:pattern id="hex" value="[0-9a-fA-F]{1,4}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="gameBase">
+        <xsd:attribute name="file" type="xsd:string" use="optional">
+            <xsd:annotation>
+                    <xsd:documentation>File containing game (for single disk or single-part games)</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                    <xsd:documentation>Name of game (must be less than 39 characters for display reasons)</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="start" type="tns:hex" use="optional">
+            <xsd:annotation>
+                    <xsd:documentation>For single-part, non disk-based games this specifies where game is loaded into memory.</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="xsd:string" use="required">
+            <xsd:annotation>
+                    <xsd:documentation>Overall game type
+06: binary (can include multiple parts)
+fc: basic (can include binary parts)
+disk: disk-based game (can include multiple disks)</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    <xsd:complexType name="part">
+        <xsd:complexContent>
+            <xsd:extension xmlns:tns="http://badvision.org" base="tns:gameBase">
+                <xsd:sequence/>
+        <xsd:attribute name="length" type="tns:hex">
+            <xsd:annotation>
+                    <xsd:documentation>Length of data to send -- if not specified then rest of file will be sent</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="offset" type="tns:hex">
+            <xsd:annotation>
+                    <xsd:documentation>Offset of data file to start from, if not specified will assume start of file</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="action" type="xsd:string" use="required">
+            <xsd:annotation>
+                    <xsd:documentation>Action to perform.  Can be one of:
+load (only load into memory)
+subroutine (execute but expect RTS to return)
+run (start program, terminate AGS)</xsd:documentation>
+                </xsd:annotation>
+        </xsd:attribute>
+
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+</xsd:schema>

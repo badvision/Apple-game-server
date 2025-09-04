@@ -1,0 +1,29 @@
+!cpu 6502
+!source "routines.a"
+*=$1000
+
+PARM_SD    =        $F1       ; [0sss00dd] s=slot, d=drive
+                              ; if dd=0, don't use drive number switch
+                              ; = use last used drive
+; Mini RWTS parms
+PTR_BUFFL  =        $FB       ; pointer (low) for addr where to load pgm
+PTR_BUFFH  =        $FC       ; (high)
+NB_SECT    =        $FD       ; number of sectors
+TRACK      =        $FE       ; start track
+SECTOR     =        $FF       ; start sector
+
+
+
+;MINI_RWTS:    LDA    PARM_SD   ; get slot# * 16
+;              AND    #%01110000
+;              TAX              ; in X
+;              LDA    PARM_SD   ; get drive#
+;              AND    #%00000011
+;              BEQ    HBA1F     ; use last used drive
+              LDY #PARM_SD
+              LDA #$00
+              LDX #$10
+!macro  rwtsExit {
+                RTS
+}
+!source "rwts/rwts_main.a"

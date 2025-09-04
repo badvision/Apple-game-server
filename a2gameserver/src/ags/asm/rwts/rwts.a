@@ -1,0 +1,78 @@
+!cpu 6502
+!source "routines.a"
+*=$1000
+;-------------
+;Taken from Dos 3.3 Disassembly from Bob Sander-Cederlof
+;Apple Assembly Line Vol 1, Issue 12
+CURRENT_TRACK       = $478
+DRIVE_1_TRACK       = $478 ;THRU 47F (INDEX BY SLOT)
+DRIVE_2_TRACK       = $4F8 ;THRU 4FF (INDEX BY SLOT)
+SEARCH_COUNT        = $4F8
+RETRY_COUNT         = $578
+RWTS_SLOT           = $5F8
+SEEK_COUNT          = $6F8
+;---------------------------------
+SECTOR     = $2D
+TRACK      = $2A
+VOLUME     = $2F
+DRIVE_NO   = $35
+DCT_PNTR   = $3C;,3D
+BUF_PNTR   = $3E;,3F
+MOTOR_TIME = $46;,47
+IOB_PNTR   = $48;,49 - TODO: avoid using these ZP locations
+;---------------------------------
+PRE_NYBBLE          = $B800
+WRITE_SECTOR        = $B82A
+READ_SECTOR         = $B8DC
+READ_ADDRESS        = $B944
+POST_NYBBLE         = $B8C2
+SEEK_TRACK_ABSOLUTE = $B9A0
+DELAY_LOOP          = $BA00
+;---------------------------------
+ERR_WRITE_PROTECT   = $10
+ERR_WRONG_VOLUME    = $20
+ERR_BAD_DRIVE       = $40
+;---------------------------------
+RWTS
+;                    STY IOB_PNTR         ;SAVE ADDRESS OF IOB
+;                    STA IOB_PNTR+1
+;                    LDY #1               ;POINT AT SLOT# IN IOB
+;                    LDA (IOB_PNTR),Y     ;SLOT# FOR THIS OPERATION
+;                    TAX
+;                    LDY #15              ;POINT AT PREVIOUS SLOT#
+;                    CMP (IOB_PNTR),Y     ;SAME SLOT?
+;                    beq PROCESS_COMMAND ;Process command
+;                    TXA                  ;SAVE NEW SLOT ON STACK
+;                    PHA
+;                    LDA (IOB_PNTR),Y     ;GET OLD SLOT#
+;                    TAX
+;                    PLA                  ;STORE NEW SLOT #
+;                    STA (IOB_PNTR),Y
+;---------------------------------
+;      FIND OUT WHAT THE COMMAND IS AND DO IT!
+;---------------------------------
+PROCESS_COMMAND
+;                    LDY #12                 ;GET COMMAND
+;                    LDA (IOB_PNTR),Y
+;                    BEQ RWTS_EXIT           ;NULL COMMAND, LET'S LEAVE
+;                    CMP #4                  ;FORMAT?
+;                    beq ERROR_HANDLER       ;You can't format this disk, you goofy bastard.
+;                    ; Put values into registers for rwts startup call
+;                    LDY IOB_PNTR
+;                    LDA IOB_PNTR+1
+                    LDX #$10
+
+!macro  rwtsExit {
+;                   LDX RWTS_SLOT       ; Necessary to reset X before exit?
+RWTS_EXIT
+                    CLC
+                    !byte $24            ;"BIT" TO SKIP NEXT INSTRUCTION
+;---------------------------------
+ERROR_HANDLER
+                    SEC                  ;INDICATE AN ERROR
+                    LDY #13              ;STORE ERROR CODE
+                    STA (IOB_PNTR),Y
+                    cli                 ;Re-enable interrupts
+                    RTS
+}
+!source "rwts/rwts_main.a"

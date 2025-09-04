@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<project name="ags" default="default" basedir=".">
+    <description>Builds, tests, and runs the project ags.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <import file="nbproject/profiler-build-impl.xml"/>
+    <!--
+
+    There exist several targets which are by default empty and which can be 
+    used for execution of your tasks. These targets are usually executed 
+    before and after some main targets. They are: 
+
+      -pre-init:                 called before initialization of project properties
+      -post-init:                called after initialization of project properties
+      -pre-compile:              called before javac compilation
+      -post-compile:             called after javac compilation
+      -pre-compile-single:       called before javac compilation of single file
+      -post-compile-single:      called after javac compilation of single file
+      -pre-compile-test:         called before javac compilation of JUnit tests
+      -post-compile-test:        called after javac compilation of JUnit tests
+      -pre-compile-test-single:  called before javac compilation of single JUnit test
+      -post-compile-test-single: called after javac compilation of single JUunit test
+      -pre-jar:                  called before JAR building
+      -post-jar:                 called after JAR building
+      -post-clean:               called after cleaning build products
+
+    (Targets beginning with '-' are not intended to be called on their own.)
+
+    Example of inserting an obfuscator after compilation could look like this:
+
+        <target name="-post-compile">
+            <obfuscate>
+                <fileset dir="${build.classes.dir}"/>
+            </obfuscate>
+        </target>
+
+    For list of available properties check the imported 
+    nbproject/build-impl.xml file. 
+
+
+    Another way to customize the build is by overriding existing main targets.
+    The targets of interest are: 
+
+      -init-macrodef-javac:     defines macro for javac compilation
+      -init-macrodef-junit:     defines macro for junit execution
+      -init-macrodef-debug:     defines macro for class debugging
+      -init-macrodef-java:      defines macro for class execution
+      -do-jar-with-manifest:    JAR building (if you are using a manifest)
+      -do-jar-without-manifest: JAR building (if you are not using a manifest)
+      run:                      execution of project 
+      -javadoc-build:           Javadoc generation
+      test-report:              JUnit report generation
+
+    An example of overriding the target for project execution could look like this:
+
+        <target name="run" depends="ags-impl.jar">
+            <exec dir="bin" executable="launcher.exe">
+                <arg file="${dist.jar}"/>
+            </exec>
+        </target>
+
+    Notice that the overridden target depends on the jar target and not only on 
+    the compile target as the regular run target does. Again, for a list of available 
+    properties which you can use, check the target you are overriding in the
+    nbproject/build-impl.xml file. 
+
+    -->
+    <target name="acme">
+        <mkdir dir="./build/classes/ags/asm"/>
+        <echo message="assembling file: ${src} for ${type} slot ${slot}"/>
+        <exec executable="acme" dir="./src/ags/asm" failonerror="false" outputproperty="output" resultproperty="result">
+            <arg line="-DSLOT=${slot} -D${type}=1 -f plain -o ../../../build/classes/ags/asm/${dest} ${src}"/>
+        </exec>
+        <echo message=">>> acme compile for ${src} for ${type} slot ${slot} ended with result ${result} -- ${output}"/>
+    </target>
+
+    <target name="compile_driver_slot" >
+<!--        <propertyfile file="./src/ags/asm/build.properties.${dest}" description="">
+            <entry key="SLOT" value="${slot}"/>
+            <entry key="${type}" value="1"/>
+        </propertyfile>
+        <concat destfile="./src/ags/asm/build.properties.${dest}" binary="true">
+            <path path="./src/ags/asm/comment.txt"/>
+            <path path="./src/ags/asm/build.properties.tmp.${dest}"/>
+        </concat>-->
+        <antcall target="acme" inheritall="true"/>
+<!--        <delete file="./src/ags/asm/build.properties.${dest}"/>
+        <delete file="./src/ags/asm/build.properties.tmp.${dest}"/>-->
+    </target>
+    <target name="compile_gs" if="slot1or2">
+        <antcall target="compile_driver_slot" inheritall="true">
+            <param name="type" value="GS"/>
+            <param name="dest" value="${dest}_gs_port${slot}.o"/>
+        </antcall>
+    </target>
+    <target name="compile_driver">
+        <condition property="slot1or2">
+            <matches pattern="[1-2]" string="${slot}"/>
+        </condition>
+        <antcall target="compile_gs"/>
+        <antcall target="compile_driver_slot">
+            <param name="type" value="SSC"/>
+            <param name="dest" value="${dest}_ssc_slot${slot}.o"/>
+        </antcall>
+    </target>
+    <target name="compile_all">
+        <parallel failonany="true">
+            <antcall target="compile_driver">
+                <param name="src" value="init/init.a"/>
+                <param name="dest" value="init"/>
+            </antcall>
+            <antcall target="compile_driver">
+                <param name="src" value="rwts/rwts.a"/>
+                <param name="dest" value="rwts"/>
+            </antcall>
+            <antcall target="compile_driver">
+                <param name="src" value="rwts/minirwts.a"/>
+                <param name="dest" value="minirwts"/>
+            </antcall>
+            <antcall target="compile_driver">
+                <param name="src" value="rwts/c6rwts.a"/>
+                <param name="dest" value="c6rwts"/>
+            </antcall>
+            <antcall target="compile_driver">
+                <param name="src" value="sos/sos.a"/>
+                <param name="dest" value="sos_lo"/>
+            </antcall>
+            <antcall target="compile_driver">
+                <param name="src" value="sos/sos_himem.a"/>
+                <param name="dest" value="sos_hi"/>
+            </antcall>
+        </parallel>
+    </target>
+    <target name="-post-clean">
+        <parallel failonany="true">
+            <antcall target="compile_all" >
+                <param name="slot" value="1"/>
+            </antcall>
+            <antcall target="compile_all">
+                <param name="slot" value="2"/>
+            </antcall>
+<!--            <antcall target="compile_all">
+                <param name="slot" value="3"/>
+            </antcall>-->
+            <antcall target="compile_all">
+                <param name="slot" value="4"/>
+            </antcall>
+            <antcall target="compile_all">
+                <param name="slot" value="5"/>
+            </antcall>
+            <antcall target="compile_all">
+                <param name="slot" value="6"/>
+            </antcall>
+            <antcall target="compile_all">
+                <param name="slot" value="7"/>
+            </antcall>
+            <antcall target="acme">
+                <param name="src" value="compression/deflate_sos.a"/>
+                <param name="dest" value="deflate.o"/>
+                <param name="slot" value="0"/>
+                <param name="type" value="UNIVERSAL"/>
+            </antcall>
+        </parallel>
+    </target>
+</project>
