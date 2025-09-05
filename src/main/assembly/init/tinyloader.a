@@ -1,0 +1,79 @@
+; TinyLoader - Compact, resilient transfer loader
+; Simple protocol: [addr_lo] [addr_hi] [size] [data...] with real-time checksum feedback
+; Size optimized with non-inline macros
+
+!cpu 6502
+!source "routines.a"
+
+*=$300
+
+; Initialize serial card and announce TinyLoader ready
+.start:
+    SEI                 ; Disable interrupts to prevent firmware interference
+    +initSerialCard
+ 
+.ack:
+    ; Send "S0" to signal TinyLoader ready
+    LDX #'S'
+    JSR sendByte
+    LDX #'0'
+    JSR sendByte
+    
+.main_loop:
+    ; Read target address (2 bytes)
+    JSR readByte        ; Get target address low byte
+    STA storeAddr+1
+    TAX
+    JSR sendByte
+    JSR readByte        ; Get target address high byte
+    STA storeAddr+2
+    BEQ .start          ; If high byte = 0, reset (target = $00xx)
+    TAX
+    JSR sendByte
+    
+    ; Read transfer size
+    JSR readByte        ; Get size
+    BNE .start_transfer ; If size != 0, start data transfer
+    
+    ; Size = 0: Execute at target address using indirect jump
+    JMP (storeAddr+1)   ; Jump to address stored in storeAddr+1,+2
+    
+.start_transfer:
+    STA $FC             ; Store size counter
+    TAX
+    JSR sendByte
+    
+    ; Reset checksum for this transfer
+    LDA #$00
+    STA $FE
+    
+.data_loop:
+    JSR readByte        ; Read data byte
+storeAddr:
+    STA $0000           ; Self-modifying: target address set above
+    EOR $FE
+    STA $FE             ; Update running XOR checksum
+    
+    ; Send checksum immediately for real-time feedback
+    TAX                 ; Transfer checksum from A to X (saves byte + cycle)
+    JSR sendByte
+    
+    ; Increment target address (self-modifying code)
+    INC storeAddr+1
+    BNE .no_carry
+    INC storeAddr+2
+.no_carry:
+    DEC $FC             ; Decrement byte counter
+    BNE .data_loop      ; Continue until all bytes received
+    
+    ; Transfer completed - jump to top
+    BEQ .ack
+
+; Serial routines (non-inline to save space)
+sendByte:
+    +sendByteInline
+    RTS
+
+readByte:
+    +readByteInline
+    RTS

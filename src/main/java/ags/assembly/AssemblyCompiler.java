@@ -16,6 +16,7 @@ public class AssemblyCompiler {
     
     private static final List<String> ASSEMBLY_FILES = Arrays.asList(
         "init/init.a",
+        "init/tinyloader.a",
         "rwts/rwts.a", 
         "rwts/minirwts.a",
         "rwts/c6rwts.a",

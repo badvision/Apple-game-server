@@ -38,6 +38,7 @@ public class Script {
         confirm(Confirm.class),
         echo(Echo.class),
         echoCheck(EchoCheck.class),
+        executeTinyLoader(ExecuteTinyLoader.class),
         expect(Expect.class),
         expectPrompt(ExpectPrompt.class),
         flowControl(FlowControl.class),
@@ -53,6 +54,8 @@ public class Script {
         sendMessage(SendMessage.class),
         sendText(SendText.class),
         sendTextBlind(SendTextBlind.class),
+        sendTinyLoader(SendTinyLoader.class),
+        sendTinyLoaderWelcome(SendTinyLoaderWelcome.class),
         set(SetVariable.class),
         wait(Wait.class);
         

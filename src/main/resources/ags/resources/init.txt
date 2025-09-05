@@ -155,45 +155,53 @@ sendTextBlind ""
 expectPrompt *
 sendText "CALL -151"
 
-echo "Changing port speed"
-;This binary code kicks the serial port into 115.2k baud, 8-N-1
-sendBinary ags/asm/init_{driver}.o 300
+echo "Loading TinyLoader for resilient transfer"
+;Load the TinyLoader - compact packet-based bootstrap loader
+sendBinary ags/asm/tinyloader_{driver}.o 300
 expectPrompt ""
 sendText "300G"
 ;Extra linefeed just in case!
 sendTextBlind ""
-;Now change our speed to match the apple's
+;Now change our speed to match the apple's (TinyLoader sets 115200 baud)
 baud 115200
 ;Give the apple a moment to catch up
 wait 750
-;Expect a valid monitor prompt before going on!
-expectPrompt *
-sendText ""
+;TinyLoader should now be running and will send "S0" to confirm
 jump stage2
 
-; Debug doesn't jump to 115200 baud right away
-; It's slower but more reliable overall, especially on the //c
+; Debug doesn't use high-speed mode initially  
+; Uses hex-typing for TinyLoader installation, then TinyLoader for everything else
 [bootstrap_debug]
 expectPrompt ]
 sendText ""
 expectPrompt *
 sendText "CALL -151"
+
+echo "Loading TinyLoader for resilient transfer (debug mode)"
+sendBinary ags/asm/tinyloader_{driver}.o 300
+expectPrompt ""
+sendText "300G"
+sendTextBlind ""
 jump stage2
 
 [stage2]
 ;-----------------------------------------------------------------
-;This part loads the SOS driver to the apple's ram by typing it in one byte at a time
+;TinyLoader stage - uses packet-based protocol for resilient transfer
 onError DRIVER_ERROR
-echo "Sending driver"
-sendMessage "LOADING DRIVER"
-;type in the program now.
-;Set this to the version you want to use
-sendBinary ags/asm/sos_himem_{driver}.o 800
-;Now execute the driver.  Note: The first byte at $800 is unused for disk loader support.
-expectPrompt false
-sendText "801G"
-baud 115200
-echo "The driver has been transferred -- Bootstrap process is complete!"
+echo "TinyLoader confirmed running"
+sendMessage "APPLE GAME SERVER LOADING..."
+
+;Display welcome message and test TinyLoader transfer capability
+sendTinyLoaderWelcome
+
+echo "Sending SOS driver via TinyLoader protocol"
+sendMessage "LOADING MAIN DRIVER"
+;Send the SOS driver using TinyLoader - much more resilient than hex typing
+sendTinyLoader ags/asm/sos_himem_{driver}.o 800
+
+;Execute the SOS driver at $801 (first byte at $800 is unused)
+executeTinyLoader 801
+echo "TinyLoader bootstrap process complete - SOS driver running!"
 jump END
 ;-----------------------------------------------------------------
 [INIT_2_ERROR]
