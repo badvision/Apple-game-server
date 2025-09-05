@@ -180,6 +180,23 @@ public abstract class RWTS {
                 RWTS_REPLACEMENT = "ags/asm/"+driverName+"_ssc_slot" + slot + ".o";
             }
             InputStream data = ClassLoader.getSystemResourceAsStream(RWTS_REPLACEMENT);
+            if (data == null) {
+                // Try alternative resource loading methods
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                if (cl != null) {
+                    data = cl.getResourceAsStream(RWTS_REPLACEMENT);
+                }
+                if (data == null) {
+                    data = RWTS.class.getClassLoader().getResourceAsStream(RWTS_REPLACEMENT);
+                }
+                if (data == null) {
+                    data = RWTS.class.getResourceAsStream("/" + RWTS_REPLACEMENT);
+                }
+                if (data == null) {
+                    throw new IOException("RWTS driver not found: " + RWTS_REPLACEMENT + 
+                        ". Available drivers may not include slot " + slot + " for driver " + driverName);
+                }
+            }
             RWTS_SECTOR = new byte[data.available()];
             RWTS_SIZE = data.read(RWTS_SECTOR);
             System.out.println("Using RWTS "+RWTS_REPLACEMENT+", length="+RWTS_SIZE+" bytes");

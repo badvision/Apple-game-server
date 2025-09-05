@@ -445,9 +445,32 @@ public class TransferHost extends GenericHost {
             try {
                 String filename = GAMES_DIR + "/" + g.getFile();
                 System.out.println("Attempting to load disk image " + filename);
-                Disk33 boot = new Disk33(filename);
+                System.out.println("Resource path: " + filename);
+                System.out.println("ClassLoader: " + c.getClass().getName());
+                InputStream diskStream = c.getResourceAsStream(filename);
+                if (diskStream == null) {
+                    // Try alternative resource loading approaches
+                    System.out.println("First attempt failed, trying alternative paths...");
+                    diskStream = c.getResourceAsStream("/" + filename);
+                    if (diskStream == null) {
+                        diskStream = TransferHost.class.getResourceAsStream("/" + filename);
+                        if (diskStream == null) {
+                            diskStream = ClassLoader.getSystemResourceAsStream(filename);
+                        }
+                    }
+                    if (diskStream == null) {
+                        throw new IOException("Disk image not found with any method: " + filename);
+                    } else {
+                        System.out.println("Successfully loaded disk image with alternative method");
+                    }
+                } else {
+                    System.out.println("Successfully loaded disk image: " + filename);
+                }
+                Disk33 boot = new Disk33(diskStream);
                 d.insertDisk(5, 0, boot);
             } catch (IOException ex) {
+                System.err.println("Failed to load disk image: " + g.getName());
+                System.err.println("Error: " + ex.getMessage());
                 Logger.getLogger(TransferHost.class.getName()).log(Level.SEVERE, "Error inserting disk " + g.getName(), ex);
             }
         }
@@ -477,6 +500,16 @@ public class TransferHost extends GenericHost {
                 filename = "ags/asm/" + driverName + "_ssc_slot" + slot + ".o";
             }
             InputStream data = ClassLoader.getSystemResourceAsStream(filename);
+            if (data == null) {
+                // Try alternative resource loading methods
+                data = TransferHost.class.getClassLoader().getResourceAsStream(filename);
+                if (data == null) {
+                    data = TransferHost.class.getResourceAsStream("/" + filename);
+                    if (data == null) {
+                        throw new IOException("Driver not found: " + filename);
+                    }
+                }
+            }
             byte[] driverData = new byte[data.available()];
             data.read(driverData);
             data.close();
