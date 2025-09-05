@@ -44,7 +44,14 @@ public class GameInfoWidget extends FrameBasedWidget {
     boolean hasScreenshots = false;
 
     public void drawScreenshot(String filename, int x, int y, int xSize, int ySize) throws IOException {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(SCREENSHOTS_PATH+"/" + filename);
+        String fullPath = SCREENSHOTS_PATH+"/" + filename;
+        System.out.println("DEBUG: Trying to load screenshot: " + fullPath);
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(fullPath);
+        if (in == null) {
+            System.out.println("DEBUG: Screenshot not found: " + fullPath);
+            System.out.println("DEBUG: SCREENSHOTS_PATH = " + SCREENSHOTS_PATH);
+            return; // Skip drawing this screenshot instead of crashing
+        }
         BufferedImage i = ImageIO.read(in);
         app.getScreen().drawImage(x, y, x + xSize, y + ySize, i);
     }
