@@ -452,7 +452,7 @@ public class GenericHost {
         // Original formula was broken: (10000 / currentBaud) gave wrong results
         int waitTime;
         if (currentBaud >= 115200) {
-            waitTime = 10;  // Conservative timing for high speed after baud changes
+            waitTime = 20;  // More conservative timing for high speed after baud changes
         } else if (currentBaud >= 19200) {
             waitTime = 15;  // Moderate timing for medium speeds
         } else if (currentBaud <= 300) {
