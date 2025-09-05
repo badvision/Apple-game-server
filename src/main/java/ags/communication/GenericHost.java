@@ -448,14 +448,17 @@ public class GenericHost {
     public void writeSlowly(String s) throws IOException {
         System.out.println(">>" + s);
         byte bytes[] = s.getBytes();
-        // Calculate proper wait time based on actual character transmission time
-        // Use 3x safety margin: actual char time * 3, with reasonable bounds
-        long nanosPerChar = DataUtil.nanosPerCharAtSpeed(currentBaud);
-        int waitTime = (int) Math.max(1, Math.min(100, (nanosPerChar * 3) / 1000000));
-        
-        // Special case for very slow baud rates
-        if (currentBaud <= 300) {
-            waitTime = 75;
+        // Calculate wait time with more conservative approach for high speeds
+        // Original formula was broken: (10000 / currentBaud) gave wrong results
+        int waitTime;
+        if (currentBaud >= 115200) {
+            waitTime = 10;  // Conservative timing for high speed after baud changes
+        } else if (currentBaud >= 19200) {
+            waitTime = 15;  // Moderate timing for medium speeds
+        } else if (currentBaud <= 300) {
+            waitTime = 75;  // Keep original slow timing for 300 baud
+        } else {
+            waitTime = Math.max(20, 100000 / currentBaud);  // Corrected formula for other speeds
         }
         for (int i = 0; i < bytes.length; i++) {
             waitToSend(100);
