@@ -92,6 +92,11 @@ public class GenericHost {
      * Legacy mode means we are talking to a much older ][ which doens't like lowercase.
      */
     static boolean legacyMode = false;
+    
+    /**
+     * Bootstrap phase flag - when true, use conservative timing for monitor input
+     */
+    private static boolean isBootstrapPhase = true;
 
     public static void setLegacyMode(boolean mode) {
         legacyMode = mode;
@@ -99,6 +104,15 @@ public class GenericHost {
 
     public static boolean isLegacyMode() {
         return legacyMode;
+    }
+    
+    public static void setBootstrapPhase(boolean bootstrap) {
+        isBootstrapPhase = bootstrap;
+        System.out.println("Bootstrap phase set to: " + bootstrap);
+    }
+    
+    public static boolean isBootstrapPhase() {
+        return isBootstrapPhase;
     }
     /**
      * CTRL-X is used to cancel a line of input
@@ -507,14 +521,17 @@ public class GenericHost {
      */
     public void writeQuickly(String s) throws IOException {
         byte bytes[] = s.getBytes();
-        // Use same conservative timing as writeSlowly for echo checking reliability
+        // Fast timing for runtime driver communication, conservative for bootstrap
         int waitTime;
-        if (currentBaud >= 115200) {
-            waitTime = 25;  // Conservative for high speed echo checking
-        } else if (currentBaud >= 19200) {
+        if (isBootstrapPhase && currentBaud >= 19200) {
+            // Conservative timing during bootstrap for monitor hex input
             waitTime = 50;  // Conservative for monitor echo checking at 19200 baud
+        } else if (currentBaud >= 115200) {
+            waitTime = 5;   // Fast for runtime driver communication at 115200 baud
+        } else if (currentBaud >= 19200) {
+            waitTime = 10;  // Moderate for medium speeds
         } else if (currentBaud >= 1200) {
-            waitTime = 25;  // Moderate for slower speeds
+            waitTime = 20;  // Moderate for slower speeds
         } else {
             waitTime = 40;  // Conservative for very slow speeds
         }

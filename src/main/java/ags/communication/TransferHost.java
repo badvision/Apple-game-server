@@ -114,12 +114,14 @@ public class TransferHost extends GenericHost {
         try {
             expect(DRIVER_ACK, 2000, false);
             System.out.println("Received acknowledgement response from Apple!");
+            GenericHost.setBootstrapPhase(false); // Switch to fast runtime communication
         } catch (IOException e) {
             Thread.currentThread().setName("Error during startup");
             System.out.println("Didn't get an immediate response from the driver, trying a few acknowledge tests.");
             try {
                 testDriver();
                 System.out.println("Received acknowledgement response from Apple!");
+                GenericHost.setBootstrapPhase(false); // Switch to fast runtime communication
                 Thread.currentThread().setName("Recovered from startup error");
             } catch (IOException ex) {
                 System.out.println("ALERT: Didn't detect the apple driver is running.  Ensure it is started (will retry in 20 seconds)");
