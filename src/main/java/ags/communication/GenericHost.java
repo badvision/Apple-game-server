@@ -476,7 +476,17 @@ public class GenericHost {
      */
     public void writeQuickly(String s) throws IOException {
         byte bytes[] = s.getBytes();
-        int waitTime = Math.min(5, Math.max(100, (115200 / currentBaud) * 10));
+        // Use same conservative timing as writeSlowly for echo checking reliability
+        int waitTime;
+        if (currentBaud >= 115200) {
+            waitTime = 25;  // Conservative for high speed echo checking
+        } else if (currentBaud >= 19200) {
+            waitTime = 50;  // Conservative for monitor echo checking at 19200 baud
+        } else if (currentBaud >= 1200) {
+            waitTime = 25;  // Moderate for slower speeds
+        } else {
+            waitTime = 40;  // Conservative for very slow speeds
+        }
         for (int i = 0; i < bytes.length; i++) {
             waitToSend(50);
             writeOutput(bytes, i, 1);
