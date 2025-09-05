@@ -26,7 +26,7 @@ import javax.imageio.ImageIO;
 public class GameInfoWidget extends FrameBasedWidget {
 
     @Configurable(category=Configurable.CATEGORY.RUNTIME, isRequired=false)
-    public static String SCREENSHOTS_PATH = "screenshots";
+    public static String SCREENSHOTS_PATH = "data/screenshots";
     @Configurable(category=Configurable.CATEGORY.ADVANCED, isRequired=false)
     public static int SCREENSHOT_SMALL_WIDTH = 10;
     @Configurable(category=Configurable.CATEGORY.ADVANCED, isRequired=false)
