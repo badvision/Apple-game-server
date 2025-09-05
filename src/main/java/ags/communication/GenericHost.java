@@ -287,7 +287,7 @@ public class GenericHost {
                         writeQuickly(o);
                         System.out.print(o);
                         if (o.charAt(0) >= 32) {
-                            expect(o, 500, false);
+                            expectCharWithPromptTolerance(o, 500);
                         }
                     }
                     System.out.println("<{");
@@ -412,6 +412,37 @@ public class GenericHost {
             throw new IOException("expected " + string + " but timed out");
         } else {
             throw new IOException("Expected " + string + " but got " + searchString.toString());
+        }
+    }
+
+    /**
+     * Expect a character echo but be tolerant of monitor prompts like * and ]
+     */
+    public boolean expectCharWithPromptTolerance(String expectedChar, int timeout) throws IOException {
+        StringBuffer searchString = new StringBuffer();
+        while (timeout > 0) {
+            Launcher.checkRuntimeStatus();
+            for (; inputAvailable() == 0 && timeout > 0; timeout--) {
+                DataUtil.wait(1);
+            }
+            String receivedString = readString();
+            receivedString = DataUtil.convertFromAppleText(receivedString);
+            searchString.append(receivedString);
+            
+            String received = searchString.toString();
+            // Check if we got the expected character (echo)
+            if (received.contains(expectedChar)) {
+                return true;
+            }
+            // Also accept if we only got monitor prompts (*, ], etc) - this means the character was processed
+            if (received.trim().matches("[*\\]\\>\\<]+")) {
+                return true; // Character was processed, just got prompt back
+            }
+        }
+        if (searchString.length() == 0) {
+            throw new IOException("expected echo of " + expectedChar + " but timed out");
+        } else {
+            throw new IOException("Expected echo of " + expectedChar + " but got " + searchString.toString());
         }
     }
 
