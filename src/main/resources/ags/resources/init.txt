@@ -188,7 +188,7 @@ echo "Sending driver"
 sendMessage "LOADING DRIVER"
 ;type in the program now.
 ;Set this to the version you want to use
-sendBinary ags/asm/sos_hi_{driver}.o 800
+sendBinary ags/asm/sos_himem_{driver}.o 800
 ;Now execute the driver.  Note: The first byte at $800 is unused for disk loader support.
 expectPrompt false
 sendText "801G"
