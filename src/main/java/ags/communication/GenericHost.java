@@ -449,14 +449,14 @@ public class GenericHost {
         System.out.println(">>" + s);
         byte bytes[] = s.getBytes();
         // Much more conservative timing to prevent character loss
-        // Apple II needs extra time especially after baud rate changes
+        // Apple II needs extra time especially during monitor hex input and after baud changes
         int waitTime;
         if (currentBaud >= 115200) {
             waitTime = 50;  // Very conservative for high speed after baud changes
         } else if (currentBaud >= 19200) {
-            waitTime = 40;  // Conservative for medium speeds  
+            waitTime = 100; // Much more conservative for monitor hex input at 19200 baud
         } else if (currentBaud >= 1200) {
-            waitTime = 30;  // Moderate for slower speeds
+            waitTime = 50;  // More conservative for slower speeds
         } else {
             waitTime = 75;  // Original timing for very slow speeds
         }
