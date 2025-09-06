@@ -86,9 +86,14 @@ public class GameResultsWidget extends FrameBasedWidget {
                 app.getScreen().drawBox(getX() + getXSize() - 1, scrollStart, getX() + getXSize()-1, scrollStart + scrollSize, true);
             }
         } else {
-            app.getScreen().drawText(getX(), getY(), "--> Loading game <--", true);
-            app.getScreen().drawText(getX(), getY() + 1, selection.getName(), false);
-            app.getScreen().drawText(getX(), getY() + 2, "Starting Address: " + selection.getStart(), false);
+            // Use starburst loading screen if we have TextScreen40, otherwise use original
+            if (app.getScreen() instanceof TextScreen40) {
+                ((TextScreen40)app.getScreen()).drawLoadingScreen("LOADING GAME", selection.getName());
+            } else {
+                app.getScreen().drawText(getX(), getY(), "--> Loading game <--", true);
+                app.getScreen().drawText(getX(), getY() + 1, selection.getName(), false);
+                app.getScreen().drawText(getX(), getY() + 2, "Starting Address: " + selection.getStart(), false);
+            }
         }
     }
 

@@ -55,6 +55,7 @@ public class Script {
         sendText(SendText.class),
         sendTextBlind(SendTextBlind.class),
         sendTinyLoader(SendTinyLoader.class),
+        sendTinyLoader44Bootstrap(SendTinyLoader44Bootstrap.class),
         sendTinyLoaderWelcome(SendTinyLoaderWelcome.class),
         set(SetVariable.class),
         wait(Wait.class);

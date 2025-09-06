@@ -57,6 +57,8 @@ public class ConfigPanel extends JFrame {
         if (f.getType().equals(String.class)) {
             if (f.getAnnotation(FileType.class) != null) {
                 return new FileComponent(f);
+            } else if ("SERIAL_PORT".equals(f.getName())) {
+                return new SerialPortSelectComponent(f);
             } else {
                 return new StringComponent(f);
             }

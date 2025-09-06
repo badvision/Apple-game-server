@@ -6,7 +6,11 @@
       "Bash(git push:*)",
       "Bash(mvn:*)",
       "Bash(java:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(xxd:*)",
+      "Read(//Users/brobert/Documents/code/**)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": [],
     "ask": []

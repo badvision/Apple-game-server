@@ -606,12 +606,13 @@ public class TransferHost extends GenericHost {
     }
     
     /**
-     * TinyLoader protocol constants
+     * TinyLoader protocol constants - balanced for real hardware
      */
-    private static final int TINYLOADER_INITIAL_CHUNK_SIZE = 128; // Larger chunks for better throughput
-    private static final int TINYLOADER_MIN_CHUNK_SIZE = 8;
+    private static final int TINYLOADER_INITIAL_CHUNK_SIZE = 128; // Conservative but larger than original
+    private static final int TINYLOADER_MIN_CHUNK_SIZE = 16;
     private static final int TINYLOADER_MAX_RETRIES = 3;
-    private static final int TINYLOADER_BYTE_TIMEOUT = 100; // 100ms timeout
+    private static final int TINYLOADER_BYTE_TIMEOUT = 50; // Conservative timeout for headers/sync
+    private static final int TINYLOADER_DATA_TIMEOUT = 25; // More realistic timeout for data bytes - first byte needs more time
     private static final byte[] ZERO = new byte[]{0};
     private static final byte[] ZERO_ASCII = new byte[]{'0'};
     
@@ -642,9 +643,9 @@ public class TransferHost extends GenericHost {
                     System.out.printf("TinyLoader: Chunk attempt %d/%d - target=$%04X, size=%d\n", 
                         attemptNumber, TINYLOADER_MAX_RETRIES, target, Math.min(chunkSize, remaining));
                     
-                    // Clear any residual buffered data before starting packet protocol
+                    // Light buffer clear - don't interfere with protocol timing
                     flush();
-                    readBytes();
+                    readBytes(); // Just clear what's already there, don't wait for more
                     
                     // New sync protocol: send 0, expect 0 back
                     try {
@@ -684,8 +685,8 @@ public class TransferHost extends GenericHost {
                         byte expectedChecksum = (byte) currentChecksum;
                         
                         try {
-                            // Use optimized write method that doesn't wait extra time
-                            writeByteAndExpectResponse(dataByte, expectedChecksum, TINYLOADER_BYTE_TIMEOUT);
+                            // Use fast timeout for data bytes - at 115200 baud response should be nearly immediate
+                            writeByteAndExpectResponse(dataByte, expectedChecksum, TINYLOADER_DATA_TIMEOUT);
                         } catch (IOException e) {
                             throw new IOException(String.format("Data byte %d/%d failed: %s", i+1, bytesToSend, e.getMessage()));
                         }
@@ -722,15 +723,14 @@ public class TransferHost extends GenericHost {
         // Check if our input buffer had anything that ended with "S0"
         if (input.length >= 2 && input[input.length-2] == 'S' && input[input.length-1] == '0' ) {
             // Looks like it already told us it was ready, but drain any extra responses
-            DataUtil.wait(50);
-            byte[] drain = readBytes();
-            if (drain.length > 0) {
-                System.out.printf("TinyLoader: Drained %d extra bytes from initial buffer\n", drain.length);
-            }
+            aggressiveDrainBuffer();
             return;
         }
         
         boolean resetSuccessful = false;
+        long resetStartTime = System.currentTimeMillis();
+        System.out.println("TinyLoader: Starting reset sequence...");
+        
         // Now send 0's until we see an S
         for (int i=0; !resetSuccessful && i < 255; i++) {
             // see if we have any input
@@ -748,21 +748,73 @@ public class TransferHost extends GenericHost {
                 
                 if (foundS0) {
                     resetSuccessful = true;
-                    // Give time for any remaining S0 responses to arrive and then drain them
-                    DataUtil.wait(50);
-                    byte[] drain = readBytes();
-                    if (drain.length > 0) {
-                        System.out.printf("TinyLoader: Drained %d extra bytes after reset\n", drain.length);
-                    }
+                    // Aggressively drain all remaining S0 responses and any other stale data
+                    aggressiveDrainBuffer();
                 }
             }
             if (!resetSuccessful) {
                 writeQuickly(ZERO);
+                
+                // Progressive delay: add 1ms for every 10 attempts to account for serial latency
+                int progressiveDelay = (i / 10);
+                if (progressiveDelay > 0) {
+                    DataUtil.wait(progressiveDelay);
+                }
             }
+        }
+        
+        long resetDuration = System.currentTimeMillis() - resetStartTime;
+        if (resetSuccessful) {
+            System.out.printf("TinyLoader: Reset successful after %d attempts in %d ms\n", 
+                (int)Math.ceil((double)resetDuration / 10), resetDuration); // rough attempt estimate
+        } else {
+            System.out.printf("TinyLoader: Reset failed after %d ms\n", resetDuration);
         }
         
         if (!resetSuccessful) {
             throw new IOException("TinyLoader: Failed to get S0 response after 255 attempts");
+        }
+    }
+    
+    /**
+     * Smart buffer draining - fast when clean, thorough when needed
+     * Optimized to minimize overhead while still catching stale "S0" responses
+     */
+    private void aggressiveDrainBuffer() throws IOException {
+        // Fast path: if buffer is already empty, just do one quick check
+        if (inputAvailable() == 0) {
+            DataUtil.wait(20); // Quick check for any delayed data
+            byte[] quickDrain = readBytes();
+            if (quickDrain.length > 0) {
+                System.out.printf("TinyLoader: Quick-drained %d delayed bytes\n", quickDrain.length);
+                // If we found delayed data, do one more thorough check
+                DataUtil.wait(30);
+                byte[] secondDrain = readBytes();
+                if (secondDrain.length > 0) {
+                    System.out.printf("TinyLoader: Second-drained %d more bytes\n", secondDrain.length);
+                }
+            }
+            return;
+        }
+        
+        // Thorough path: buffer has data, need to be more careful
+        int totalDrained = 0;
+        int drainAttempts = 0;
+        
+        // Keep draining until we get 2 consecutive empty reads with shorter delays
+        while (drainAttempts < 2) {
+            DataUtil.wait(30); // Reduced from 50ms to 30ms
+            byte[] drain = readBytes();
+            if (drain.length > 0) {
+                totalDrained += drain.length;
+                drainAttempts = 0; // Reset counter - we found more data
+            } else {
+                drainAttempts++; // No data found, increment counter
+            }
+        }
+        
+        if (totalDrained > 0) {
+            System.out.printf("TinyLoader: Thoroughly drained %d stale bytes from buffer\n", totalDrained);
         }
     }
     
@@ -775,7 +827,7 @@ public class TransferHost extends GenericHost {
 
         resetTinyLoader();
         
-        // Clear any residual buffered data before starting execution protocol
+        // Light buffer clear - don't interfere with protocol timing
         flush();
         readBytes();
         
@@ -932,7 +984,8 @@ public class TransferHost extends GenericHost {
         writeOutput((byte)13); // Return key - this executes immediately
         
         // Wait for TinyLoader to execute and initialize before starting communication
-        DataUtil.wait(2000);
+        // Extra time needed for real serial hardware vs TCP emulation
+        DataUtil.wait(3000);
     }
     
 }

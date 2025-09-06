@@ -86,16 +86,70 @@ public class Launcher implements Runnable {
     public static MACHINE_TYPES MACHINE_TYPE = MACHINE_TYPES.Apple2e;
     @Configurable(category = CATEGORY.COM, isRequired = true)
     public static PORT_TYPES PORT_TYPE = PORT_TYPES.TCP;
+    
+    // TCP Connection Settings (moved to advanced as they rarely change)
+    @Configurable(category = CATEGORY.ADVANCED, isRequired = true)
+    public static String TCP_HOST = "localhost";
+    @Configurable(category = CATEGORY.ADVANCED, isRequired = true)
+    public static int TCP_PORT = 1977;
+    
+    // Serial Port Settings
     @Configurable(category = CATEGORY.COM, isRequired = true)
-    public static String HOST = "localhost";
-    @Configurable(category = CATEGORY.COM, isRequired = true)
-    public static String PORT = "1977";
+    public static String SERIAL_PORT = getDefaultSerialPort();
     @Configurable(category = CATEGORY.COM, isRequired = false)
     public static boolean DEBUG_BOOTSTRAP = false;
     @Configurable(category = CATEGORY.ADVANCED, isRequired = false)
     public static DISPLAY_TYPES DISPLAY_TYPE = DISPLAY_TYPES.Hires_Buffered;
     static Thread activeThread = null;
     private static boolean TERMINATE_PROGRAM = false;
+    
+    /**
+     * Get list of available serial ports on this system
+     * @return Array of serial port names
+     */
+    public static String[] getAvailableSerialPorts() {
+        SerialPort[] commPorts = SerialPort.getCommPorts();
+        String[] portNames = new String[commPorts.length];
+        for (int i = 0; i < commPorts.length; i++) {
+            portNames[i] = commPorts[i].getSystemPortName();
+        }
+        return portNames;
+    }
+    
+    /**
+     * Get a reasonable default serial port for this system
+     * @return Default serial port name, or empty string if none available
+     */
+    public static String getDefaultSerialPort() {
+        String[] ports = getAvailableSerialPorts();
+        if (ports.length == 0) {
+            return ""; // No ports available
+        }
+        
+        // On macOS, prefer USB serial ports (cu.usbserial, cu.usbmodem)
+        // On Windows, prefer COM ports
+        // On Linux, prefer ttyUSB or ttyACM
+        String os = System.getProperty("os.name").toLowerCase();
+        
+        for (String port : ports) {
+            if (os.contains("mac")) {
+                if (port.contains("usbserial") || port.contains("usbmodem")) {
+                    return port;
+                }
+            } else if (os.contains("win")) {
+                if (port.startsWith("COM")) {
+                    return port;
+                }
+            } else { // Linux/Unix
+                if (port.contains("ttyUSB") || port.contains("ttyACM")) {
+                    return port;
+                }
+            }
+        }
+        
+        // If no preferred port found, return the first available
+        return ports[0];
+    }
 
     public static void checkRuntimeStatus() {
         if (TERMINATE_PROGRAM) {
@@ -189,27 +243,29 @@ public class Launcher implements Runnable {
         switch (PORT_TYPE) {
             case SERIAL:
                 try {
-                    port = SerialPort.getCommPort(PORT);
+                    port = SerialPort.getCommPort(SERIAL_PORT);
                     if (port.openPort()) {
-                        System.out.println("Opened port: " + port.getSystemPortName());
+                        // Configure for no buffering - immediate byte-by-byte communication
+                        // Use semi-blocking with short timeout to eliminate async buffering
+                        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 50, 0);
+                        System.out.println("Opened serial port: " + port.getSystemPortName() + " with no-buffer configuration");
                     } else {
                         port = null;
-                        throw new IOException("Failed to open port '" + PORT + "'!");
+                        throw new IOException("Failed to open serial port '" + SERIAL_PORT + "'!");
                     }
                 } catch (Throwable t) {
-                    System.out.println("Error opening port: " + PORT);
+                    System.out.println("Error opening serial port: " + SERIAL_PORT);
                     t.printStackTrace();
                     port = null;
-                    throw new IOException("Port '" + PORT + "' is not available!");
+                    throw new IOException("Serial port '" + SERIAL_PORT + "' is not available!");
                 }
 
                 host = new TransferHost(port);
                 break;
 
             case TCP:
-                int portnum = Integer.parseInt(PORT);
-                host =
-                        new TCPTransferHost(HOST, portnum);
+                host = new TCPTransferHost(TCP_HOST, TCP_PORT);
+                System.out.println("Connecting to TCP host: " + TCP_HOST + ":" + TCP_PORT);
                 break;
 
         }

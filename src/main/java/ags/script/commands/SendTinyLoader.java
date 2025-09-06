@@ -61,7 +61,7 @@ public class SendTinyLoader extends AbstractCommand {
             System.out.println("SendTinyLoader: Sending " + translatedFile + " to $" + start);
             
             // Use TinyLoader protocol for transfer
-            int errors = host.sendRawDataTinyLoader(fileData, address, 0, fileData.length);
+            int errors = host.sendRawDataTinyLoader(fileData, address);
             
             if (errors > 0) {
                 System.out.println("SendTinyLoader: Transfer completed with " + errors + " errors");

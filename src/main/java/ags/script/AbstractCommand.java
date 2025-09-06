@@ -176,6 +176,30 @@ public abstract class AbstractCommand {
         } catch (BadVariableValueException ex) {
             throw new FatalScriptException("Error during last-minute validation check", ex);
         }
+        
+        // Clear all stale input/output data before executing any command
+        try {
+            ags.communication.GenericHost host = ags.communication.GenericHost.getInstance();
+            if (host != null) {
+                // Flush transmit buffer to ensure no stale outbound data
+                host.flush();
+                
+                // Clear receive buffer to ensure no stale inbound data
+                byte[] staleData = host.readBytes();
+                if (staleData.length > 0) {
+                    System.out.printf("Script: Cleared %d bytes of stale receive data before %s: ", 
+                        staleData.length, this.getClass().getSimpleName());
+                    for (byte b : staleData) {
+                        System.out.printf("%02X ", b & 0xFF);
+                    }
+                    System.out.println();
+                }
+            }
+        } catch (Exception e) {
+            // Don't fail the command if buffer clearing fails
+            System.out.println("Script: Warning - couldn't clear stale data: " + e.getMessage());
+        }
+        
         doExecute();
     }
 
