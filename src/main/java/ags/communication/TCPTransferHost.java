@@ -26,6 +26,7 @@ public class TCPTransferHost extends TransferHost {
     public TCPTransferHost(String host, int port) throws IOException {
         try {
             socket = new Socket(host, port);
+            socket.setTcpNoDelay(true); // Disable Nagle's algorithm for immediate transmission
             in = socket.getInputStream();
             out = socket.getOutputStream();
         } catch (UnknownHostException ex) {

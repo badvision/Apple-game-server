@@ -119,7 +119,7 @@ public class GenericHost {
      */
     public static char CANCEL_INPUT = 24; // CTRL-X cancels the input
     // When sending data to the apple in hex, this controls how many bytes are sent per line
-    public static String HEX_BYTES_PER_LINE = "hexBytesPerLine";
+    public static final String HEX_BYTES_PER_LINE = "hexBytesPerLine";
     private boolean echoCheck;
 
     static {
@@ -171,12 +171,11 @@ public class GenericHost {
      *
      * @param baudRate Baud rate (e.g. 300, 1200, ...)
      */
-    public boolean isEchoCheck() {
+    public final boolean isEchoCheck() {
         return echoCheck;
     }
 
-    public void setEchoCheck(boolean echoCheck) {
-        System.out.println("echo check set to " + echoCheck);
+    public final void setEchoCheck(boolean echoCheck) {
         this.echoCheck = echoCheck;
     }
 
@@ -483,6 +482,16 @@ public class GenericHost {
         readInput(data);
         return data;
     }
+    
+    /**
+     * Flush the output stream to ensure all data is sent
+     * @throws IOException If the stream cannot be flushed
+     */
+    public void flush() throws IOException {
+        if (out != null) {
+            out.flush();
+        }
+    }
 
     /**
      * write a string out and sleep a little to let the buffer empty out
@@ -520,7 +529,15 @@ public class GenericHost {
      * @throws java.io.IOException If the data could not be sent
      */
     public void writeQuickly(String s) throws IOException {
-        byte bytes[] = s.getBytes();
+        writeQuickly(s.getBytes());
+    }
+    
+    public void writeQuickly(byte b) throws IOException {
+        byte[] buf = new byte[]{b};
+        writeQuickly(buf);
+    }
+
+    public void writeQuickly(byte[] bytes) throws IOException {
         // Fast timing for runtime driver communication, conservative for bootstrap
         int waitTime;
         if (isBootstrapPhase && currentBaud >= 19200) {
@@ -585,6 +602,88 @@ public class GenericHost {
      */
     public void writeOutput(byte... buffer) throws IOException {
         writeOutput(buffer, 0, buffer.length);
+    }
+    
+    /**
+     * Write a byte and wait for expected response byte with timeout
+     * Optimized for packet protocols where immediate response is expected
+     * 
+     * @param dataByte Byte to send
+     * @param expectedResponse Expected response byte
+     * @param timeout Timeout in milliseconds
+     * @throws IOException If timeout occurs or unexpected response received
+     */
+    /**
+     * Expect only the last byte received to match the expected value
+     * Ignores any buffered data from previous operations
+     */
+    public boolean expectLastByte(byte expectedByte, int timeout) throws IOException {
+        long startTime = System.currentTimeMillis();
+        byte lastByte = 0;
+        boolean receivedData = false;
+        
+        while ((System.currentTimeMillis() - startTime) < timeout) {
+            Launcher.checkRuntimeStatus();
+            if (inputAvailable() > 0) {
+                byte[] allData = readBytes(); // Read all available data
+                if (allData.length > 0) {
+                    lastByte = allData[allData.length - 1]; // Only care about the last byte
+                    receivedData = true;
+                    if (lastByte == expectedByte) {
+                        return true; // Success
+                    } else {
+                        throw new IOException(String.format("Expected %02X but got %02X (last of %d bytes)", 
+                            expectedByte & 0xFF, lastByte & 0xFF, allData.length));
+                    }
+                }
+            }
+            Thread.yield();
+        }
+        
+        if (receivedData) {
+            throw new IOException(String.format("Expected %02X but got %02X", 
+                expectedByte & 0xFF, lastByte & 0xFF));
+        } else {
+            throw new IOException(String.format("Timeout waiting for %02X after %d ms", 
+                expectedByte & 0xFF, timeout));
+        }
+    }
+
+    public void writeByteAndExpectResponse(byte dataByte, byte expectedResponse, int timeout) throws IOException {
+        // Write the byte
+        writeOutput(dataByte);
+        out.flush();
+        
+        // Wait for response with timeout - only check last byte received
+        long startTime = System.currentTimeMillis();
+        byte lastByte = 0;
+        boolean receivedData = false;
+        
+        while ((System.currentTimeMillis() - startTime) < timeout) {
+            Launcher.checkRuntimeStatus();
+            if (inputAvailable() > 0) {
+                byte[] allData = readBytes(); // Read all available data
+                if (allData.length > 0) {
+                    lastByte = allData[allData.length - 1]; // Only care about the last byte
+                    receivedData = true;
+                    if (lastByte == expectedResponse) {
+                        return; // Success
+                    } else {
+                        throw new IOException(String.format("Expected response %02X but got %02X (last of %d bytes)", 
+                            expectedResponse & 0xFF, lastByte & 0xFF, allData.length));
+                    }
+                }
+            }
+            Thread.yield();
+        }
+        
+        if (receivedData) {
+            throw new IOException(String.format("Expected response %02X but got %02X", 
+                expectedResponse & 0xFF, lastByte & 0xFF));
+        } else {
+            throw new IOException(String.format("Timeout waiting for response %02X after %d ms", 
+                expectedResponse & 0xFF, timeout));
+        }
     }
 
     /**

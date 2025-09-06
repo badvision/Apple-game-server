@@ -62,6 +62,7 @@ baud 19200
 onError INIT_2_ERROR
 jump apple2_standard
 
+
 [Apple2e_debug]
 ; Debug startup using no echo
 require init
@@ -153,19 +154,13 @@ sendTextBlind "{enableEcho}"
 sendTextBlind ""
 ;Now we know the current apple speed, kick it into overdrive (115.2k baud)
 expectPrompt *
-sendText "CALL -151"
 
-echo "Loading TinyLoader for resilient transfer"
-;Load the TinyLoader - compact packet-based bootstrap loader
-sendBinary ags/asm/tinyloader_{driver}.o 300
-expectPrompt ""
-sendText "300G"
-;Extra linefeed just in case!
-sendTextBlind ""
+echo "Loading TinyLoader using 4+4 encoded BASIC (much faster than hex typing!)"
+;Load and execute TinyLoader using 4+4 encoding - replaces entire hex typing phase
+sendTinyLoader44Bootstrap
 ;Now change our speed to match the apple's (TinyLoader sets 115200 baud)
 baud 115200
-;Give the apple a moment to catch up
-wait 750
+;No wait needed - TCP/IP emulation makes baud rate changes instant
 ;TinyLoader should now be running and will send "S0" to confirm
 jump stage2
 
@@ -175,13 +170,10 @@ jump stage2
 expectPrompt ]
 sendText ""
 expectPrompt *
-sendText "CALL -151"
 
-echo "Loading TinyLoader for resilient transfer (debug mode)"
-sendBinary ags/asm/tinyloader_{driver}.o 300
-expectPrompt ""
-sendText "300G"
-sendTextBlind ""
+echo "Loading TinyLoader using 4+4 encoded BASIC (debug mode)"
+;Load and execute TinyLoader using 4+4 encoding - replaces hex typing
+sendTinyLoader44Bootstrap
 jump stage2
 
 [stage2]
@@ -189,13 +181,11 @@ jump stage2
 ;TinyLoader stage - uses packet-based protocol for resilient transfer
 onError DRIVER_ERROR
 echo "TinyLoader confirmed running"
-sendMessage "APPLE GAME SERVER LOADING..."
 
 ;Display welcome message and test TinyLoader transfer capability
 sendTinyLoaderWelcome
 
 echo "Sending SOS driver via TinyLoader protocol"
-sendMessage "LOADING MAIN DRIVER"
 ;Send the SOS driver using TinyLoader - much more resilient than hex typing
 sendTinyLoader ags/asm/sos_himem_{driver}.o 800
 

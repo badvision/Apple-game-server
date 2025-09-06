@@ -90,11 +90,12 @@ public class TextScreen40 extends IVirtualScreen {
      */
     /**
      * Given y-coordinate, calculate screen buffer offset
+     * Uses proper Apple II text screen row calculation from Jace emulator
      * @param i Logical y-coordinate
      * @return Offset in screen buffer for that row
      */
     private int getYOffset(int i) {
-        return 128 * (i % 8) + 40 * (i / 8);
+        return ((i & 7) << 7) + 40 * (i >> 3);
     }
 
     /**
@@ -187,6 +188,16 @@ public class TextScreen40 extends IVirtualScreen {
     public byte[] getBuffer() {
         return this.buffer;
     }
+    
+    /**
+     * Get only the text screen portion ($400-$7FF)
+     * @return Text screen buffer data (1024 bytes)
+     */
+    public byte[] getTextScreenBuffer() {
+        byte[] textScreen = new byte[0x400]; // 1024 bytes
+        System.arraycopy(buffer, 0, textScreen, 0, 0x400);
+        return textScreen;
+    }
 
     public int getDisplayOffset() {
         return 0x0400;
@@ -214,5 +225,117 @@ public class TextScreen40 extends IVirtualScreen {
         } catch (IOException ex) {
             Logger.getLogger(TextScreen40.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
+    }
+
+    /**
+     * Draw a starburst gradient background pattern on the entire screen
+     */
+    public void drawStarburstBackground() {
+        int centerX = 20; // Center of 40-column screen
+        int centerY = 12; // Center of 24-row screen
+        
+        for (int y = 0; y < 24; y++) {
+            for (int x = 0; x < 40; x++) {
+                char bgChar = getStarburstChar(x, y, centerX, centerY);
+                drawText(x, y, String.valueOf(bgChar), false);
+            }
+        }
+    }
+    
+    /**
+     * Get the appropriate ASCII character for starburst pattern based on position
+     * @param x X coordinate
+     * @param y Y coordinate  
+     * @param centerX Center X coordinate
+     * @param centerY Center Y coordinate
+     * @return ASCII character for this position
+     */
+    private char getStarburstChar(int x, int y, int centerX, int centerY) {
+        if (x == centerX && y == centerY) {
+            return '*'; // Center point
+        }
+        
+        // Calculate distance from center
+        double distance = Math.sqrt((x - centerX) * (x - centerX) + (y - centerY) * (y - centerY));
+        
+        // Calculate angle for sunburst rays
+        double angle = Math.atan2(y - centerY, x - centerX);
+        
+        // Create 8 main rays (every 45 degrees)
+        double rayAngle = angle * 4 / Math.PI; // Convert to ray coordinates
+        double rayPhase = Math.abs(rayAngle - Math.round(rayAngle));
+        
+        // Determine if we're on a ray (closer to ray center = lower rayPhase)
+        boolean onRay = rayPhase < 0.3; // Width of rays
+        
+        // Choose character based on distance and ray position
+        if (distance < 1.5) {
+            return '*'; // Center
+        } else if (distance < 4 && onRay) {
+            return '+'; // Inner ray
+        } else if (distance < 7 && onRay) {
+            return 'o'; // Middle ray
+        } else if (distance < 10 && onRay) {
+            return '.'; // Outer ray
+        } else if (distance < 13 && onRay) {
+            return '-'; // Far ray
+        } else if (distance < 8) {
+            return '.'; // Background dots between rays
+        } else {
+            return ' '; // Empty space
+        }
+    }
+    
+    /**
+     * Draw loading screen with starburst background and centered inverse text
+     * @param loadingText The loading message to display
+     */
+    public void drawLoadingScreen(String loadingText) {
+        drawLoadingScreen(loadingText, null);
+    }
+    
+    /**
+     * Draw loading screen with starburst background and game name
+     * @param loadingText The loading message to display
+     * @param gameName The name of the game being loaded (optional)
+     */
+    public void drawLoadingScreen(String loadingText, String gameName) {
+        // First draw the starburst background
+        drawStarburstBackground();
+        
+        // Prepare messages
+        String[] messages;
+        if (gameName != null && !gameName.trim().isEmpty()) {
+            messages = new String[]{loadingText, "", gameName};
+        } else {
+            messages = new String[]{loadingText};
+        }
+        
+        // Calculate starting position to center the block of text
+        int startY = 12 - (messages.length - 1) / 2;
+        
+        // Find the longest line for clearing space
+        int maxLength = 0;
+        for (String msg : messages) {
+            if (msg.length() > maxLength) {
+                maxLength = msg.length();
+            }
+        }
+        
+        // Clear area around all text for better readability
+        String clearSpace = Util.repeat(' ', maxLength + 6);
+        for (int i = 0; i < messages.length + 2; i++) {
+            int clearX = (40 - clearSpace.length()) / 2;
+            drawText(clearX, startY - 1 + i, clearSpace, false);
+        }
+        
+        // Draw each message line in inverse text
+        for (int i = 0; i < messages.length; i++) {
+            String msg = messages[i];
+            if (!msg.isEmpty()) {
+                int textX = (40 - msg.length()) / 2;
+                drawText(textX, startY + i, msg, true);
+            }
+        }
+    }
 }

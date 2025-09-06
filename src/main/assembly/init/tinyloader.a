@@ -19,17 +19,23 @@
     LDX #'0'
     JSR sendByte
     
+    ; Synchronization: Read until we get 0, then ack with 0
+.wait_sync:
+    JSR readByte        ; Read byte from host
+    BNE .wait_sync      ; Keep reading until we get 0
+    ; Send 0 back to acknowledge sync
+    JSR sendByteA       ; A already contains 0 from readByte
+    ; Now synchronized - ready for packet
+    
 .main_loop:
     ; Read target address (2 bytes)
     JSR readByte        ; Get target address low byte
     STA storeAddr+1
-    TAX
-    JSR sendByte
+    JSR sendByteA
     JSR readByte        ; Get target address high byte
     STA storeAddr+2
-    BEQ .start          ; If high byte = 0, reset (target = $00xx)
-    TAX
-    JSR sendByte
+    BEQ .ack            ; If high byte = 0, reset (target = $00xx)
+    JSR sendByteA
     
     ; Read transfer size
     JSR readByte        ; Get size
@@ -40,8 +46,7 @@
     
 .start_transfer:
     STA $FC             ; Store size counter
-    TAX
-    JSR sendByte
+    JSR sendByteA
     
     ; Reset checksum for this transfer
     LDA #$00
@@ -55,8 +60,7 @@ storeAddr:
     STA $FE             ; Update running XOR checksum
     
     ; Send checksum immediately for real-time feedback
-    TAX                 ; Transfer checksum from A to X (saves byte + cycle)
-    JSR sendByte
+    JSR sendByteA       ; Checksum already in A, no need for TAX
     
     ; Increment target address (self-modifying code)
     INC storeAddr+1
@@ -66,10 +70,12 @@ storeAddr:
     DEC $FC             ; Decrement byte counter
     BNE .data_loop      ; Continue until all bytes received
     
-    ; Transfer completed - jump to top
-    BEQ .ack
+    ; Transfer completed - jump to main loop for next packet
+    JMP .main_loop
 
 ; Serial routines (non-inline to save space)
+sendByteA:
+    TAX
 sendByte:
     +sendByteInline
     RTS

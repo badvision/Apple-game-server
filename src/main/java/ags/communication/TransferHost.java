@@ -16,6 +16,7 @@ import static ags.game.GameUtil.*;
 import ags.script.Engine;
 import ags.script.Target;
 import ags.script.Variable;
+import ags.ui.TextScreen40;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -242,12 +243,18 @@ public class TransferHost extends GenericHost {
      */
     public boolean startGame(GameBase game) throws IOException {
         Launcher.checkRuntimeStatus();
-        Game g = null;
+        Game g;
         Part p = null;
-        if (game instanceof Game) {
-            g = (Game) game;
+        assert(game != null);
+        
+        if (game instanceof Game game1) {
+            g = game1;
             Thread.currentThread().setName("Executing game " + g.getName());
-            if (g.getPart() != null && g.getPart().size() > 0) {
+            
+            // Display loading screen with game name
+            displayGameLoadingScreen(g.getName());
+            
+            if (g.getPart() != null && !g.getPart().isEmpty()) {
                 for (Part gg : g.getPart()) {
                     System.out.println("Loading game part: " + gg.getName());
                     if (!startGame(gg)) {
@@ -265,7 +272,7 @@ public class TransferHost extends GenericHost {
             p = (Part) game;
         }
         if (game.getFile() != null && !"".equals(game.getFile())) {
-            // Do some zero-page patches (based on observations)
+            // Do some ZERO-page patches (based on observations)
             /*
             storeMemory(0x2E, 0x21, 0x01);
             storeMemory(0x3A, 0xba, 0x00);
@@ -320,8 +327,8 @@ public class TransferHost extends GenericHost {
     /**
      * Send a game binary file to the apple
      * @param g Game to send to the apple
-     * @return Length of transfered data
-     * @throws java.io.IOException java.io.IOException If there is a problem sending data
+     * @return Length of transferred data
+     * @throws java.io.IOException If there is a problem sending data
      */
     public int loadGame(GameBase g) throws IOException {
         // So now the driver is started, start the upload process
@@ -338,8 +345,7 @@ public class TransferHost extends GenericHost {
         int address = toInt(g.getStart());
         int length = fileData.length;
         int offset = 0;
-        if (g instanceof Part) {
-            Part p = (Part) g;
+        if (g instanceof Part p) {
             if (p.getOffset() != null) {
                 offset = Math.min(length - 1, toInt(p.getOffset()));
             }
@@ -602,379 +608,331 @@ public class TransferHost extends GenericHost {
     /**
      * TinyLoader protocol constants
      */
-    private static final int TINYLOADER_INITIAL_CHUNK_SIZE = 64; // Larger chunks for better throughput
+    private static final int TINYLOADER_INITIAL_CHUNK_SIZE = 128; // Larger chunks for better throughput
     private static final int TINYLOADER_MIN_CHUNK_SIZE = 8;
     private static final int TINYLOADER_MAX_RETRIES = 3;
-    private static final int TINYLOADER_BYTE_RETRIES = 3; // Fewer retries since it's working
-    private static final int TINYLOADER_BYTE_TIMEOUT = 50; // 50ms timeout
-    // No artificial delays needed - echo verification provides timing synchronization
+    private static final int TINYLOADER_BYTE_TIMEOUT = 100; // 100ms timeout
+    private static final byte[] ZERO = new byte[]{0};
+    private static final byte[] ZERO_ASCII = new byte[]{'0'};
     
     /**
-     * Send data using the TinyLoader protocol - more resilient bootstrap transfer
+     * Send data using the TinyLoader protocol with optional reset
      * @param fileData Data to send
      * @param addressStart Starting address in apple's ram to load data
-     * @param dataStart Starting offset in data to send
-     * @param length Length of data to send over
      * @throws IOException If there was trouble sending data after retries
      * @return Total number of errors experienced when sending data
      */
-    public int sendRawDataTinyLoader(byte[] fileData, int addressStart, int dataStart, int length) throws IOException {
-        // Ensure clean state with verified reset
-        if (!resetAndVerifyTinyLoader()) {
-            throw new IOException("TinyLoader not responding or unable to achieve clean state");
-        }
-        System.out.println("TinyLoader: Confirmed clean state and ready for transfer");
+    public int sendRawDataTinyLoader(byte[] fileData, int addressStart) throws IOException {
+        int dataOffset = 0;
+        int target = addressStart;
+        int remaining = fileData.length;
+        int errors = 0;
+        int chunkSize = TINYLOADER_INITIAL_CHUNK_SIZE;
         
-        int offset = dataStart;
-        int end = dataStart + length;
-        int totalErrors = 0;
-        int maxChunkSize = Math.min(255, TINYLOADER_INITIAL_CHUNK_SIZE); // Max 255 bytes per transfer
-        
-        System.out.println("TinyLoader transfer: " + length + " bytes to $" + Integer.toHexString(addressStart));
-        
-        // Transfer in chunks of up to 255 bytes
-        while (offset < end) {
-            Launcher.checkRuntimeStatus();
-            int size = Math.min(maxChunkSize, end - offset);
-            int currentAddress = addressStart + (offset - dataStart);
-            
-            System.out.printf("TinyLoader: Transferring %d bytes to $%04X\n", size, currentAddress);
-            
-            boolean transferSuccess = false;
-            for (int attempt = 0; attempt < TINYLOADER_MAX_RETRIES && !transferSuccess; attempt++) {
+        while (remaining > 0) {
+            int chunkRetriesLeft = TINYLOADER_MAX_RETRIES;
+            boolean chunkSentSuccessfully = false;
+            int attemptNumber = 1;
+            while (!chunkSentSuccessfully && --chunkRetriesLeft > 0) {
+                // First we ensure the loader starts at a ready state each time
+                // If this fails, it throws an error because we cannot recover if reset doesn't work!
+                resetTinyLoader();
+                
                 try {
-                    transferSuccess = sendTinyLoaderChunk(fileData, offset, size, currentAddress, attempt);
+                    System.out.printf("TinyLoader: Chunk attempt %d/%d - target=$%04X, size=%d\n", 
+                        attemptNumber, TINYLOADER_MAX_RETRIES, target, Math.min(chunkSize, remaining));
                     
-                    // After successful chunk transfer, wait for TinyLoader to send S0
-                    if (transferSuccess) {
+                    // Clear any residual buffered data before starting packet protocol
+                    flush();
+                    readBytes();
+                    
+                    // New sync protocol: send 0, expect 0 back
+                    try {
+                        writeByteAndExpectResponse((byte)0, (byte)0, TINYLOADER_BYTE_TIMEOUT);
+                    } catch (IOException e) {
+                        throw new IOException("Sync handshake failed: " + e.getMessage());
+                    }
+                    
+                    // Now send the target address (little endian) expecting echo from client
+                    byte addressLow = (byte) (target & 0x0ff);
+                    try {
+                        writeByteAndExpectResponse(addressLow, addressLow, TINYLOADER_BYTE_TIMEOUT);
+                    } catch (IOException e) {
+                        throw new IOException("Address low byte failed: " + e.getMessage());
+                    }
+                    
+                    byte addressHigh = (byte) (target >> 8);
+                    try {
+                        writeByteAndExpectResponse(addressHigh, addressHigh, TINYLOADER_BYTE_TIMEOUT);
+                    } catch (IOException e) {
+                        throw new IOException("Address high byte failed: " + e.getMessage());
+                    }
+                    
+                    // Send the packet length and expect echo
+                    int bytesToSend = Math.min(chunkSize, remaining);
+                    byte lengthByte = (byte) bytesToSend;
+                    try {
+                        writeByteAndExpectResponse(lengthByte, lengthByte, TINYLOADER_BYTE_TIMEOUT);
+                    } catch (IOException e) {
+                        throw new IOException("Length byte failed: " + e.getMessage());
+                    }
+                    
+                    int currentChecksum = 0;
+                    for (int i=0; i < bytesToSend; i++) {
+                        byte dataByte = fileData[dataOffset + i];
+                        currentChecksum = currentChecksum ^ (dataByte & 0x0ff);
+                        byte expectedChecksum = (byte) currentChecksum;
+                        
                         try {
-                            expect("S0", 100, false); // Wait for TinyLoader ready signal
-                            System.out.println("TinyLoader: S0 received - ready for next chunk");
+                            // Use optimized write method that doesn't wait extra time
+                            writeByteAndExpectResponse(dataByte, expectedChecksum, TINYLOADER_BYTE_TIMEOUT);
                         } catch (IOException e) {
-                            System.out.println("TinyLoader: No S0 response - continuing anyway");
-                            readBytes(); // Clear any stale data
+                            throw new IOException(String.format("Data byte %d/%d failed: %s", i+1, bytesToSend, e.getMessage()));
                         }
                     }
+                    target += bytesToSend;
+                    remaining -= bytesToSend;
+                    dataOffset += bytesToSend;
+                    chunkSentSuccessfully = true;
                 } catch (IOException e) {
-                    totalErrors++;
-                    System.out.printf("TinyLoader: Transfer attempt %d failed: %s\n", attempt + 1, e.getMessage());
-                    
-                    if (attempt == TINYLOADER_MAX_RETRIES - 1) {
-                        // Final attempt - throw error and fail transfer
-                        throw new IOException("TinyLoader: Failed to transfer chunk after " + TINYLOADER_MAX_RETRIES + " attempts", e);
+                    // Uh oh, this didn't work.  Retry!
+                    System.out.printf("TinyLoader: Error encountered during chunk transfer: %s\n", e.getMessage());
+                    System.out.printf("TinyLoader: Reducing chunk size from %d to %d and retrying\n", chunkSize, Math.max(TINYLOADER_MIN_CHUNK_SIZE, chunkSize / 2));
+                    chunkSize = Math.max(TINYLOADER_MIN_CHUNK_SIZE, chunkSize / 2);
+                    errors++;
+                }
+            }
+            if (!chunkSentSuccessfully) {
+                throw new IOException(String.format("TinyLoader: Failed to send chunk after %d attempts - target=$%04X, size=%d", 
+                    TINYLOADER_MAX_RETRIES, target, Math.min(chunkSize, remaining)));
+            }
+        }
+        if (errors > 0) {
+            System.out.printf("TinyLoader: Transfer complete - sent %d bytes with %d errors\n", fileData.length, errors);
+        }
+        return errors;
+    }
+        
+    public void resetTinyLoader() throws IOException{
+
+        // First flush our in/out buffers
+        flush();
+        byte[] input = readBytes();
+        
+        // Check if our input buffer had anything that ended with "S0"
+        if (input.length >= 2 && input[input.length-2] == 'S' && input[input.length-1] == '0' ) {
+            // Looks like it already told us it was ready, but drain any extra responses
+            DataUtil.wait(50);
+            byte[] drain = readBytes();
+            if (drain.length > 0) {
+                System.out.printf("TinyLoader: Drained %d extra bytes from initial buffer\n", drain.length);
+            }
+            return;
+        }
+        
+        boolean resetSuccessful = false;
+        // Now send 0's until we see an S
+        for (int i=0; !resetSuccessful && i < 255; i++) {
+            // see if we have any input
+            if (inputAvailable() > 0) {
+                input = readBytes();
+                
+                // Look for "S0" pattern anywhere in the received data (handles buffered responses)
+                boolean foundS0 = false;
+                for (int j = 0; j < input.length - 1; j++) {
+                    if (input[j] == 'S' && input[j + 1] == '0') {
+                        foundS0 = true;
+                        break;
+                    }
+                }
+                
+                if (foundS0) {
+                    resetSuccessful = true;
+                    // Give time for any remaining S0 responses to arrive and then drain them
+                    DataUtil.wait(50);
+                    byte[] drain = readBytes();
+                    if (drain.length > 0) {
+                        System.out.printf("TinyLoader: Drained %d extra bytes after reset\n", drain.length);
                     }
                 }
             }
-            
-            offset += size;
+            if (!resetSuccessful) {
+                writeQuickly(ZERO);
+            }
         }
         
-        System.out.println("TinyLoader transfer complete with " + totalErrors + " total errors");
-        return totalErrors;
+        if (!resetSuccessful) {
+            throw new IOException("TinyLoader: Failed to get S0 response after 255 attempts");
+        }
     }
     
     /**
      * Execute code at specified address using TinyLoader
+     * @param address target address to JMP to
      */
     public void executeTinyLoader(int address) throws IOException {
-        System.out.println("TinyLoader: Executing code at $" + Integer.toHexString(address));
+        System.out.printf("TinyLoader: Executing code at $%04X\n", address);
+
+        resetTinyLoader();
         
-        // Send: [addr_lo] [addr_hi] [size=0] to trigger execution - no delays needed
-        writeOutput((byte)(address & 0xFF));
-        writeOutput((byte)((address >> 8) & 0xFF));
-        writeOutput((byte)0x00); // Size 0 = execute
-        out.flush();
+        // Clear any residual buffered data before starting execution protocol
+        flush();
+        readBytes();
         
-        System.out.println("TinyLoader: Execution command sent");
-    }
-    
-    /**
-     * Send a single chunk using the simplified TinyLoader protocol
-     */
-    private boolean sendTinyLoaderChunk(byte[] fileData, int offset, int size, int address, int attempt) throws IOException {
-        // No artificial delays needed - echo verification provides timing sync
-        
-        // Temporarily disable echo checking during TinyLoader protocol to prevent echo corruption
-        boolean originalEchoCheck = isEchoCheck();
-        if (originalEchoCheck) {
-            System.out.println("TinyLoader: Temporarily disabling echo checking to prevent serial echo corruption");
-            setEchoCheck(false);
-        }
-        
+        // New sync protocol: send 0, expect 0 back
         try {
-            // Send: [addr_lo] [addr_hi] [size] [data...]
-        System.out.printf("TinyLoader: Sending header: addr=%04X, size=%d\n", address, size);
-        
-        // Clear any stale data before sending header
-        readBytes();
-        
-        byte addrLo = (byte)(address & 0xFF);
-        byte addrHi = (byte)((address >> 8) & 0xFF);
-        byte sizeB = (byte)size;
-        
-        System.out.printf("TinyLoader: Header bytes: %02X %02X %02X\n", addrLo & 0xFF, addrHi & 0xFF, sizeB & 0xFF);
-        
-        // Clear any pending responses before header
-        readBytes();
-        
-        // Send header bytes with echo verification (TinyLoader now echoes each one)
-        writeOutput(addrLo);
-        out.flush();
-        expectByte(addrLo & 0xFF, "address low echo");
-        
-        writeOutput(addrHi);
-        out.flush();
-        expectByte(addrHi & 0xFF, "address high echo");
-        
-        writeOutput(sizeB);
-        out.flush(); 
-        expectByte(sizeB & 0xFF, "size echo");
-        
-        System.out.printf("TinyLoader: Header echoes confirmed: %02X %02X %02X\n", addrLo & 0xFF, addrHi & 0xFF, sizeB & 0xFF);
-        
-        System.out.println("TinyLoader: Header sent, starting data transfer...");
-        
-        // Send data bytes with per-byte retry logic and running XOR checksum verification
-        // Apple II sends running checksum: byte0 ^ byte1 ^ ... ^ currentByte
-        // CRITICAL: Treat all bytes as unsigned (0-255) to avoid Java signed byte issues
-        // Since we verified clean reset upfront, start with checksum = 0
-        int runningChecksum = 0;
-        for (int i = 0; i < size; i++) {
-            int dataByte = fileData[offset + i] & 0xFF;  // Convert to unsigned
-            runningChecksum ^= dataByte;  // XOR with unsigned values
-            runningChecksum &= 0xFF;     // Keep in byte range
-            
-            boolean byteConfirmed = false;
-            int byteRetries = 0;
-            
-            while (!byteConfirmed && byteRetries < TINYLOADER_BYTE_RETRIES) {
-                try {
-                    // Clear any stale input 
-                    readBytes();
-                    
-                    // Send data byte and wait for checksum response (no artificial delays)
-                    writeOutput((byte)dataByte);
-                    out.flush();
-                    
-                    // Wait for checksum response with spin loop
-                    long timeoutStart = System.currentTimeMillis();
-                    while (in.available() == 0 && (System.currentTimeMillis() - timeoutStart) < TINYLOADER_BYTE_TIMEOUT) {
-                        Thread.onSpinWait();
-                    }
-                    
-                    if (in.available() == 0) {
-                        throw new IOException("Timeout waiting for checksum");
-                    }
-                    
-                    // Read checksum response and any additional data
-                    int receivedChecksum = in.read() & 0xFF;
-                    byte[] extraData = readBytes(); // Clear any additional data
-                    
-                    if (receivedChecksum == runningChecksum) {
-                        byteConfirmed = true;
-                    } else {
-                        byteRetries++;
-                        if (byteRetries >= TINYLOADER_BYTE_RETRIES) {
-                            System.out.printf("TinyLoader: Checksum fail byte %d: expected %02X, got %02X", 
-                                             i, runningChecksum, receivedChecksum);
-                            if (extraData.length > 0) {
-                                System.out.printf(" (+ %d extra bytes: ", extraData.length);
-                                for (byte b : extraData) {
-                                    System.out.printf("%02X ", b & 0xFF);
-                                }
-                                System.out.print(")");
-                            }
-                            System.out.println();
-                        }
-                    }
-                    
-                } catch (IOException e) {
-                    byteRetries++;
-                    if (byteRetries >= TINYLOADER_BYTE_RETRIES) {
-                        System.out.printf("TinyLoader: Error on byte %d: %s\n", i, e.getMessage());
-                    }
-                }
-            }
-            
-            if (!byteConfirmed) {
-                throw new IOException(String.format(
-                    "TinyLoader: Failed to confirm byte %d (value %02X) after %d retries", 
-                    i, dataByte, TINYLOADER_BYTE_RETRIES));
-            }
-        }
-        
-            System.out.printf("TinyLoader: Successfully sent %d bytes with running checksum verification\n", size);
-            return true;
-            
-        } finally {
-            // Always restore original echo checking setting
-            if (originalEchoCheck) {
-                System.out.println("TinyLoader: Restoring echo checking");
-                setEchoCheck(true);
-            }
-        }
-    }
-    
-    /**
-     * Reset TinyLoader - simplified since completed transfers just return to main loop
-     */
-    private boolean resetAndVerifyTinyLoader() throws IOException {
-        System.out.println("TinyLoader: Performing reset...");
-        
-        // Reset sends 0x00,0x00 which triggers S0 response from TinyLoader
-        if (!resetTinyLoaderSimple()) {
-            System.out.println("TinyLoader: Reset failed - no S0 response");
-            return false;
-        }
-        
-        // Clear any leftover data
-        readBytes(); // Clear any remaining data
-        
-        System.out.println("TinyLoader: Reset successful - ready for transfer");
-        return true;
-    }
-    
-    /**
-     * Aggressive TinyLoader reset - breaks out of stuck data loops
-     */
-    private boolean resetTinyLoaderSimple() throws IOException {
-        System.out.println("TinyLoader: Performing aggressive reset...");
-        
-        // Clear any pending input data first
-        readBytes();
-        
-        // If stuck in data loop, need to complete the current transfer first
-        // Send up to 255 zero bytes to satisfy any pending byte counter
-        System.out.println("TinyLoader: Clearing any stuck data transfer...");
-        for (int i = 0; i < 255; i++) {
-            writeOutput((byte)0x00);
-            out.flush(); // Ensure each byte is sent immediately
-            
-            // Check if we get any response (checksum or S0) without delay
-            if (in.available() > 0) {
-                byte[] response = readBytes();
-                System.out.printf("TinyLoader: Got response after %d zero bytes: ", i + 1);
-                for (byte b : response) {
-                    System.out.printf("%02X ", b & 0xFF);
-                }
-                System.out.println();
-                
-                // Check if we got S0 (TinyLoader reset)
-                String responseStr = new String(response);
-                if (responseStr.contains("S0")) {
-                    System.out.println("TinyLoader: Reset successful via data completion");
-                    return true;
-                }
-            }
-        }
-        
-        // Now try the normal reset sequence
-        readBytes(); // Clear any remaining data
-        System.out.println("TinyLoader: Attempting address-based reset...");
-        
-        // Send target address 0000 to trigger reset with more aggressive flushing
-        System.out.println("TinyLoader: Sending reset command (0000)...");
-        writeOutput((byte)0x00);
-        out.flush(); // Flush after each byte
-        
-        writeOutput((byte)0x00);
-        out.flush(); // Flush after each byte
-        
-        // Wait for S0 response
-        System.out.println("TinyLoader: Waiting for S0 response...");
-        
-        try {
-            expect("S0", 3000, false);
-            System.out.println("TinyLoader: Address-based reset successful");
-            return true;
+            writeByteAndExpectResponse((byte)0, (byte)0, TINYLOADER_BYTE_TIMEOUT);
         } catch (IOException e) {
-            System.err.println("TinyLoader: Address-based reset failed - " + e.getMessage());
-            return false;
+            throw new IOException("Execution sync handshake failed: " + e.getMessage());
         }
-    }
-    
-    /**
-     * Write a single byte with precise timing delay
-     */
-    private void writeOutputWithDelay(byte b, int delayNanos) throws IOException {
-        writeOutput(b);
-        if (delayNanos > 0) {
-            DataUtil.nanosleep(delayNanos);
-        }
-    }
-    
-    /**
-     * Wait for a specific byte value with timeout (for echo verification)
-     */
-    private void expectByte(int expectedByte, String description) throws IOException {
-        long timeoutStart = System.currentTimeMillis();  
-        while (in.available() == 0 && (System.currentTimeMillis() - timeoutStart) < TINYLOADER_BYTE_TIMEOUT) {
-            Thread.onSpinWait();
+
+        // Now send the target address (little endian) expecting echo from client
+        byte addressLow = (byte) (address & 0x0ff);
+        try {
+            writeByteAndExpectResponse(addressLow, addressLow, TINYLOADER_BYTE_TIMEOUT);
+        } catch (IOException e) {
+            throw new IOException("Execution address low byte failed: " + e.getMessage());
         }
         
-        if (in.available() == 0) {
-            throw new IOException("TinyLoader: Timeout waiting for " + description);
+        byte addressHigh = (byte) (address >> 8);
+        try {
+            writeByteAndExpectResponse(addressHigh, addressHigh, TINYLOADER_BYTE_TIMEOUT);
+        } catch (IOException e) {
+            throw new IOException("Execution address high byte failed: " + e.getMessage());
         }
         
-        int receivedByte = in.read() & 0xFF;
-        if (receivedByte != expectedByte) {
-            throw new IOException(String.format("TinyLoader: %s mismatch: expected %02X, got %02X", 
-                description, expectedByte, receivedByte));
-        }
+        // Send the packet length (no echo) - 0 means execute
+        writeQuickly(ZERO);
     }
-    
-    /**
-     * Compute XOR checksum for TinyLoader protocol
-     * CRITICAL: Use unsigned arithmetic to avoid Java signed byte issues
-     */
-    private byte computeChecksumTinyLoader(byte[] data, int start, int size) {
-        int checksum = 0;
-        for (int i = start; i < start + size; i++) {
-            checksum ^= (data[i] & 0xFF);  // Convert to unsigned before XOR
-        }
-        return (byte)(checksum & 0xFF);  // Convert back to byte
-    }
-    
-    
+        
     /**
      * Initialize TinyLoader with welcome message on screen
      */
     public void initTinyLoaderWithWelcome() throws IOException {
         System.out.println("Loading TinyLoader and displaying welcome message...");
         
-        // Create screen memory data (text page 1: $400-$7FF)
-        byte[] screenData = new byte[0x400]; // 1024 bytes
+        // Create a TextScreen40 instance to draw the starburst background
+        TextScreen40 screen = new TextScreen40();
+        screen.drawLoadingScreen("APPLE GAME SERVER", "LOADING SYSTEM...");
         
-        // Fill with spaces (Apple II text uses $A0 for space)
-        for (int i = 0; i < screenData.length; i++) {
-            screenData[i] = (byte)0xA0;
-        }
-        
-        // Add welcome message in center of screen
-        String[] message = {
-            "APPLE GAME SERVER",
-            "",
-            "LOADING SYSTEM...",
-            "",
-            "TINYLOADER ACTIVE"
-        };
-        
-        // Position message starting at row 10 (each row is 40 chars)
-        int startRow = 10;
-        for (int line = 0; line < message.length; line++) {
-            String text = message[line];
-            int startCol = (40 - text.length()) / 2; // Center text
-            int offset = (startRow + line) * 40 + startCol;
-            
-            for (int i = 0; i < text.length(); i++) {
-                // Convert ASCII to Apple II high-bit text
-                screenData[offset + i] = (byte)(text.charAt(i) | 0x80);
-            }
-        }
-        
-        // Send screen data using TinyLoader protocol
-        sendRawDataTinyLoader(screenData, 0x400, 0, screenData.length);
-        
-        System.out.println("TinyLoader welcome message displayed!");
+        // Send screen data using TinyLoader protocol (no reset needed - freshly bootstrapped)
+        byte[] screenData = screen.getTextScreenBuffer();
+        sendRawDataTinyLoader(screenData, 0x400);
     }
+    
+    /**
+     * Display loading screen with game name using SOS kernel text screen
+     */
+    private void displayGameLoadingScreen(String gameName) throws IOException {
+        System.out.println("Displaying loading screen for: " + gameName);
+        
+        // Create a TextScreen40 instance to draw the starburst background
+        TextScreen40 screen = new TextScreen40();
+        screen.drawLoadingScreen("LOADING GAME", gameName);
+        
+        // Send the screen buffer to Apple II memory using standard memory operations
+        byte[] screenData = screen.getBuffer();
+        sendRawData(screenData, 0x400, 0, screenData.length);
+        
+        System.out.println("Game loading screen displayed for: " + gameName);
+    }
+        
+
+    /**
+     * Generate 4+4 encoded BASIC with direct PEEK approach (like autumn.bas)
+     * Much more compact - no variables needed, direct memory access
+     * @param binaryData The binary data to encode
+     * @param targetAddress Where to load the data
+     * @param executeAddress Address to execute after loading
+     * @param offset Character offset (32 or 64)
+     * @return BASIC program as single line
+     */
+    private String generate44EncodedBasicWithOffset(byte[] binaryData, int targetAddress, int offset, boolean execute) {
+        // Encode the binary data as high nibbles + low nibbles
+        StringBuilder highNibbles = new StringBuilder();
+        StringBuilder lowNibbles = new StringBuilder();
+        
+        for (byte b : binaryData) {
+            int byteValue = b & 0xFF;
+            int highNibble = (byteValue >> 4) + offset;  // Upper 4 bits + offset
+            int lowNibble = (byteValue & 0x0F) + offset; // Lower 4 bits + offset
+            
+            highNibbles.append((char)highNibble);
+            lowNibbles.append((char)lowNibble);
+        }
+        
+        // Two-step approach to avoid keyboard buffer limitations:
+        // Step 1: Store encoded data on line 1: 1"[data]"
+        // Step 2: Immediate FOR loop reads from 0x806 (2054) where string data starts
+        
+        StringBuilder result = new StringBuilder();
+        
+        // Step 1: Line with encoded data
+        result.append("1\"");
+        result.append(highNibbles.toString());
+        result.append(lowNibbles.toString());
+        result.append("\"\n");
+        
+        // Step 2: Immediate FOR loop to decode and execute
+        // String data starts at 0x806 (2054) after tokenizing line 1
+        int highNibblesAddr = 2054; // 0x806 - where string data starts in line 1  
+        int lowNibblesAddr = highNibblesAddr + binaryData.length;
+        
+        result.append("FORX=0TO");
+        result.append(binaryData.length - 1);
+        result.append(":POKE");
+        result.append(targetAddress);
+        result.append("+X,(PEEK(");
+        result.append(highNibblesAddr);
+        result.append("+X)-");
+        result.append(offset);
+        result.append(")*16+(PEEK(");
+        result.append(lowNibblesAddr);
+        result.append("+X)-");
+        result.append(offset);
+        result.append("):NEXT");
+        if (execute) {
+            result.append(": CALL");
+            result.append(targetAddress);
+        }
+        
+        return result.toString();
+    }
+    
+    /**
+     * Send 4+4 encoded TinyLoader bootstrap to Apple II
+     * This replaces hex typing for initial TinyLoader loading
+     * @param tinyLoaderPath Full path to TinyLoader binary
+     */
+    public void sendTinyLoader44Bootstrap(String tinyLoaderPath) throws IOException {
+        byte[] tinyLoaderBinary = DataUtil.getFileAsBytes(tinyLoaderPath);
+
+        String bootstrap = generate44EncodedBasicWithOffset(tinyLoaderBinary, 0x0300, 'A', true);
+        if (bootstrap == null) {
+            throw new IOException("Failed to generate TinyLoader 4+4 bootstrap");
+        }
+        
+        System.out.println("Sending TinyLoader 4+4 bootstrap...");
+        
+        // Split into line 1 and immediate statement
+        String[] parts = bootstrap.split("\n");
+        String line1 = parts[0];        // 1"[encoded_data]"
+        String forLoop = parts[1];      // FOR X=0 TO...
+        
+        System.out.println("Step 1 - Store data: " + line1);
+        System.out.println("Step 2 - Execute: " + forLoop);
+        
+        // Step 1: Send line 1 with encoded data using echo verification
+        writeParanoid(line1);
+        writeOutput((byte)13); // Return key
+        DataUtil.wait(500); // Give Apple II time to tokenize
+        
+        // Step 2: Send immediate FOR loop - executes automatically when return is pressed
+        writeParanoid(forLoop);
+        writeOutput((byte)13); // Return key - this executes immediately
+        
+        // Wait for TinyLoader to execute and initialize before starting communication
+        DataUtil.wait(2000);
+    }
+    
 }
