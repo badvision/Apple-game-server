@@ -117,6 +117,7 @@ public class AcmeCompilerAdapter {
             String arch = System.getProperty("os.arch").toLowerCase();
             
             String platform;
+            String suffix = os.contains("windows") ? ".exe" : "";
             if (os.contains("mac") || os.contains("darwin")) {
                 platform = arch.contains("aarch64") || arch.contains("arm") ? "darwin-aarch64" : "darwin-x64";
             } else if (os.contains("linux")) {
@@ -127,7 +128,7 @@ public class AcmeCompilerAdapter {
                 throw new IOException("Unsupported platform: " + os + " " + arch);
             }
             
-            String resourcePath = "/native/" + platform + "/acme";
+            String resourcePath = "/native/" + platform + "/acme" + suffix;
             try (InputStream acmeStream = getClass().getResourceAsStream(resourcePath)) {
                 if (acmeStream == null) {
                     throw new IOException("ACME executable not found for platform: " + platform);
